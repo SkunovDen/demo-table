@@ -11,7 +11,7 @@ export const getModelFromHtml = (htmlTable) => {
     }
     const tableColsCount = tableRows[ rowCounter ].cells.length
     const tableRowsCount = tableRows.length
-    const tableHeaderRowsCount = rowCounter
+    // const tableHeaderRowsCount = rowCounter
 
     // console.log('COLS: ', tableColsCount)
     // console.log('ROWS: ', tableRowsCount)

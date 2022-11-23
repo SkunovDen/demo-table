@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-import loadOldTable from '../../data/OldTable'
-import loadNewTable from '../../data/NewTable'
-
 import { getModelFromHtml } from "./tableModelUtils";
 
 
@@ -23,6 +20,7 @@ const TableWithModel = (props) => {
             // console.log('MODEL ', tableModel)
         }
         createModel()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
 
@@ -50,7 +48,7 @@ const TableWithModel = (props) => {
   
     const cellClickHandler = ({ target }) => {
 
-        const colNum = target.dataset.col
+        // const colNum = target.dataset.col
         const rowNum = target.dataset.row
 
         const rowSpan = target.rowSpan
