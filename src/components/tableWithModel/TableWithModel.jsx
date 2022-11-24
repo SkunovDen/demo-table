@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { getModelFromHtml } from "./tableModelUtils";
+import { getModelFromHtml, isMergedSelected } from "./tableModelUtils";
 
 
 const TableWithModel = (props) => {
@@ -15,9 +15,6 @@ const TableWithModel = (props) => {
             const table = template.firstChild
             
             setTableModel( prev => { return  getModelFromHtml(table) } )
-
-            // console.log('INPUT TABLE ELEMENT : ', table)
-            // console.log('MODEL ', tableModel)
         }
         createModel()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -39,46 +36,71 @@ const TableWithModel = (props) => {
 
     const toggleRows = (startRow, rowsCount ) => {
         const endRow = Number(startRow) + Number(rowsCount)
-        // console.log('Toggle start: ', startRow, '   END : ', endRow)
-        
+
         for (let toglledRowNum = startRow; toglledRowNum < endRow; toglledRowNum ++){
-            toggleRow ( toglledRowNum )
+            toggleRow( toglledRowNum )
         }   
     }
   
     const cellClickHandler = ({ target }) => {
-
-        // const colNum = target.dataset.col
+        console.log(' CLICK : ', target)
+///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
+///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
+///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
+        const headerRowsCount = 4
+///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
+///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!        
+///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!        
+        
         const rowNum = target.dataset.row
-
-        const rowSpan = target.rowSpan
-        
-        // console.log('COL: ', colNum, '  ROW: ', rowNum, '   RowSpan: ', rowSpan)
-
-        toggleRows(rowNum, rowSpan)
-    }
-
-
-
-    const isMergedSelected = (colNum, rowNum, colSpan, rowSpan) => {
-        console.log('IS SELECTED CHECK : ', colNum, ' ', rowNum, '   ROWSPAN : ', rowSpan)
-         
-        const startCol = colNum
-        const endCol = Number(colNum) + colSpan
-        const startRow = rowNum
-        const endRow = Number(rowNum) + rowSpan
-
-        let result = false
-        
-        for (let col = startCol; col < endCol; col++) {
-            for (let row = startRow; row < endRow; row++) {
-                console.log('CHECK : X=', col, '   Y=', row) 
-                result = result || tableModel[row][col].selected            
-            }
+        // const rowSpan = target.rowSpan
+    
+        if (rowNum > headerRowsCount - 1){
+            const rowSpan = target.rowSpan
+            toggleRows(rowNum, target.rowSpan)
+        } else {
+            console.log(' HEADER ')
+            const colNum = Number(target.dataset.col)
+            toggleColumns(colNum, target.colSpan)
         }
-
-        return result
+    
     }
+
+
+    ///////////////////////
+
+    const toggleColumn = (colNum) => {
+        setTableModel( (prevModel) => {
+            let updatedModel = Array.from( prevModel )
+
+            updatedModel.forEach( (row, rowIndex) => {
+                
+                row.forEach( (cell, cellIndex) => {
+                    // console.log(cellIndex, ' :: ', rowIndex, ' :: ', cell)
+                    if (cellIndex === colNum) {
+                        cell.selected = !cell.selected
+                    }
+                })
+            });
+
+            return updatedModel
+        })
+    }
+
+    const toggleColumns = (startColumn, columnsCount ) => {
+        const endColumn = Number(startColumn) + Number(columnsCount)
+
+        for (let toglledColNum = startColumn; toglledColNum < endColumn; toglledColNum ++){
+            toggleColumn( toglledColNum )
+        }   
+    }
+
+
+    const test = () => {toggleColumn(12)}
+
+    
+    /////////////////////
+
 
 
     const Cell = (props) => {
@@ -89,8 +111,8 @@ const TableWithModel = (props) => {
 
 // selected one of 'back' cells
         let selectedClass
-        if (cellRowSpan > 1){
-            selectedClass = `cell ${isMergedSelected(cellCol, cellRow, cellColSpan, cellRowSpan) ? 'selected' : ''}`  
+        if ( (cellRowSpan > 1) || (cellColSpan > 1) ){
+            selectedClass = `cell ${isMergedSelected(tableModel, cellCol, cellRow, cellColSpan, cellRowSpan) ? 'selected' : ''}`  
         } else {
             selectedClass = `cell ${tableModel[cellRow][cellCol].selected ? 'selected' : ''}`        
         }
@@ -100,9 +122,14 @@ const TableWithModel = (props) => {
              (tableModel[cellRow][cellCol].visible) ? 
                 (   <td className={selectedClass}
                         style={{ padding: '5px 10px'}}
+
+
 /// add separated Listeners for header and data areas ???                         
-                        onClick = { (props.row > 3) ? (e) => cellClickHandler(e) : null }
-/// add separated Listeners for header and data areas ???  
+                        // onClick = { (props.row > 3) ? (e) => cellClickHandler(e) : null }
+                        onClick = {(e) => cellClickHandler(e) }
+/// add separated Listeners for header and data areas ??? 
+
+
                         data-col={cellCol}
                         data-row={cellRow}
                         colSpan= {cellColSpan}
@@ -126,10 +153,14 @@ const TableWithModel = (props) => {
         )
     }
 
-    const tHide = () => {
+
+
+    const tableContentHide = () => {
         const t_container = document.getElementById('table-container')
         t_container.style.color = t_container.style.color === 'white' ? 'black' : 'white' 
     }
+
+    
 
     return(
         <>                 
@@ -142,8 +173,9 @@ const TableWithModel = (props) => {
                         )
                     })}
                 </table>
-
-                <button onClick={()=>tHide()}>ON | OFF CONTENT</button>
+                <button onClick={()=>test()} style={{marginRight: '27px'}}>TEST</button>
+                
+                <button onClick={()=>tableContentHide()}>ON | OFF CONTENT</button>
             </div>
         </>
     )

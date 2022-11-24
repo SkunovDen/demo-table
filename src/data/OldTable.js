@@ -1,5 +1,5 @@
 const loadOldTable = () => {
-    return(
+    return(`
         <table border='1'>
     <tr>
         <th rowspan="4">**CLASS**</th>
@@ -298,7 +298,7 @@ const loadOldTable = () => {
         <td> 0</td>
         <td></td>
     </tr>
-</table>
+</table>`
 
     )
 }

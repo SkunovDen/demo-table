@@ -62,16 +62,13 @@ export const getModelFromHtml = (htmlTable) => {
 
     })
     
-
     return initialModel
 }
 
 
 
 
-
-
-const checkCellIndex = (cell) => {
+export const checkCellIndex = (cell) => {
 
     let table = cell.parentElement.closest("table");
     
@@ -105,4 +102,24 @@ const checkCellIndex = (cell) => {
         }
         }
     }
+}
+
+export const isMergedSelected = (tableModel, colNum, rowNum, colSpan, rowSpan) => {
+    // console.log('IS SELECTED CHECK : ', colNum, ' ', rowNum, '   ROWSPAN : ', rowSpan)
+     
+    const startCol = colNum
+    const endCol = Number(colNum) + colSpan
+    const startRow = rowNum
+    const endRow = Number(rowNum) + rowSpan
+
+    let result = false
+    
+    for (let col = startCol; col < endCol; col++) {
+        for (let row = startRow; row < endRow; row++) {
+            // console.log('CHECK : X=', col, '   Y=', row) 
+            result = result || tableModel[row][col].selected            
+        }
+    }
+
+    return result
 }
