@@ -3,7 +3,7 @@ import './App.css';
 import TableWithModel from './components/tableWithModel/TableWithModel';
 
 import loadNewTable from './data/NewTable'
-import loadOldTable from './data/OldTable'
+// import loadOldTable from './data/OldTable'
 
  
 function App() {
