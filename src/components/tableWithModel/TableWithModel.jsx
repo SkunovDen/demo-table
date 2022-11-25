@@ -100,66 +100,75 @@ const headerRowsCount = 4
 ///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!        
 ///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!        
         
-        if ( !isCtrlDown ){ clearSelection()}
         const rowNum = target.dataset.row
-        // const rowSpan = target.rowSpan
-    
-        if (rowNum > headerRowsCount - 1){
-            selectRows(rowNum, target.rowSpan)
+        
+        if ( !isCtrlDown ){ 
+            clearSelection()
+        
+            if (rowNum > headerRowsCount - 1){
+                selectRows(rowNum, target.rowSpan)
+            } else {
+                const colNum = Number(target.dataset.col)
+                selectColumns(colNum, target.colSpan)
+            }
         } else {
-            const colNum = Number(target.dataset.col)
-            selectColumns(colNum, target.colSpan)
+            if (rowNum > headerRowsCount - 1){
+                toggleRows(rowNum, target.rowSpan)
+            } else {
+                const colNum = Number(target.dataset.col)
+                toggleColumns(colNum, target.colSpan)
+            }
         }
     }
 
 
 
 
-    // const toggleColumn = (colNum) => {
-    //     setTableModel( (prevModel) => {
-    //         let updatedModel = Array.from( prevModel )
+    const toggleColumn = (colNum) => {
+        setTableModel( (prevModel) => {
+            let updatedModel = Array.from( prevModel )
 
-    //         updatedModel.forEach( (row, rowIndex) => {
+            updatedModel.forEach( (row, rowIndex) => {
                 
-    //             row.forEach( (cell, cellIndex) => {
-    //                 // console.log(cellIndex, ' :: ', rowIndex, ' :: ', cell)
-    //                 if (cellIndex === colNum) {
-    //                     cell.selected = !cell.selected
-    //                 }
-    //             })
-    //         });
+                row.forEach( (cell, cellIndex) => {
+                    // console.log(cellIndex, ' :: ', rowIndex, ' :: ', cell)
+                    if (cellIndex === colNum) {
+                        cell.selected = !cell.selected
+                    }
+                })
+            });
 
-    //         return updatedModel
-    //     })
-    // }
+            return updatedModel
+        })
+    }
 
-    // const toggleColumns = (startColumn, columnsCount ) => {
-    //     const endColumn = Number(startColumn) + Number(columnsCount)
+    const toggleColumns = (startColumn, columnsCount ) => {
+        const endColumn = Number(startColumn) + Number(columnsCount)
 
-    //     for (let toglledColNum = startColumn; toglledColNum < endColumn; toglledColNum ++){
-    //         toggleColumn( toglledColNum )
-    //     }   
-    // }
+        for (let toglledColNum = startColumn; toglledColNum < endColumn; toglledColNum ++){
+            toggleColumn( toglledColNum )
+        }   
+    }
 
-    // const toggleRow = (rowNum) => {
-    //     setTableModel( (prevModel) => {
-    //         let updatedModel = Array.from( prevModel )
+    const toggleRow = (rowNum) => {
+        setTableModel( (prevModel) => {
+            let updatedModel = Array.from( prevModel )
 
-    //         updatedModel[rowNum].forEach( (element, index) => {
-    //             updatedModel[rowNum][index].selected = !prevModel[rowNum][index].selected
-    //         });
+            updatedModel[rowNum].forEach( (element, index) => {
+                updatedModel[rowNum][index].selected = !prevModel[rowNum][index].selected
+            });
 
-    //         return updatedModel
-    //     })
-    // }
+            return updatedModel
+        })
+    }
 
-    // const toggleRows = (startRow, rowsCount ) => {
-    //     const endRow = Number(startRow) + Number(rowsCount)
+    const toggleRows = (startRow, rowsCount ) => {
+        const endRow = Number(startRow) + Number(rowsCount)
 
-    //     for (let toglledRowNum = startRow; toglledRowNum < endRow; toglledRowNum ++){
-    //         toggleRow( toglledRowNum )
-    //     }   
-    // }
+        for (let toglledRowNum = startRow; toglledRowNum < endRow; toglledRowNum ++){
+            toggleRow( toglledRowNum )
+        }   
+    }
   
 //     const cellClickHandler = ({ target }) => {
 //         console.log(' CLICK : ', target)
@@ -274,23 +283,22 @@ const headerRowsCount = 4
 
 
     return(
-        <div ref={ref} tabIndex={-1}  onKeyDown={(e)=>keyDownHandler(e)} onKeyUp={(e)=>keyReleaseHandler(e)}>                 
-            <div id="table-container" className="table-container">
+        <div id="table-container" className="table-container" ref={ref} tabIndex={-1}  onKeyDown={(e)=>keyDownHandler(e)} onKeyUp={(e)=>keyReleaseHandler(e)}> 
 
-                <table border={1}>
-                    { tableModel.map( (_r, rowIndex) => {
-                        return (
-                            <Row key={rowIndex} row={rowIndex} />
-                        )
-                    })}
-                </table>
-                <button onClick={()=>test()} style={{marginRight: '27px'}}>TEST</button>
-                
-                <button onClick={()=>tableContentHide()}>ON | OFF CONTENT</button>
-            </div>
+            <table border={1}>
+                { tableModel.map( (_r, rowIndex) => {
+                    return (
+                        <Row key={rowIndex} row={rowIndex} />
+                    )
+                })}
+            </table>
+        
+            <button onClick={()=>test()} style={{marginRight: '27px'}}>TEST</button>
+            
+            <button onClick={()=>tableContentHide()}>ON | OFF CONTENT</button>
+        
         </div>
     )
-
 }
 
 export default TableWithModel
