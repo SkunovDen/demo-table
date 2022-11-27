@@ -61,7 +61,7 @@ const TableWithModel = (props) => {
 
 
     const isMergedSelected = (colNum, rowNum, colSpan, rowSpan) => {
-        console.log('IS SELECTED CHECK : ', colNum, ' ', rowNum, '   ROWSPAN : ', rowSpan)
+        // console.log('IS SELECTED CHECK : ', colNum, ' ', rowNum, '   ROWSPAN : ', rowSpan)
          
         const startCol = colNum
         const endCol = Number(colNum) + colSpan
@@ -72,7 +72,7 @@ const TableWithModel = (props) => {
         
         for (let col = startCol; col < endCol; col++) {
             for (let row = startRow; row < endRow; row++) {
-                console.log('CHECK : X=', col, '   Y=', row) 
+                // console.log('CHECK : X=', col, '   Y=', row) 
                 result = result || tableModel[row][col].selected            
             }
         }
