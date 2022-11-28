@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
+import './TableWithModel.css'
 import { getModelFromHtml, isMergedSelected } from "./tableModelUtils";
 
 
 const TableWithModel = (props) => {
     const [tableModel, setTableModel] = useState( [] )
     const [isCtrlDown, setIsCtrlDown] = useState(false)
+
 
     useEffect( () => {
         const createModel = () => {
@@ -30,20 +32,25 @@ const TableWithModel = (props) => {
 
 
     const clearSelection = () => {
+
         setTableModel( (prev) => {
             const clearedModel = Array.from( prev )
 
             clearedModel.forEach( (row, rowIndex) => {
                 row.forEach( (cell, cellIndex) => {
                     clearedModel[rowIndex][cellIndex].selected = false
+                    clearedModel[rowIndex][cellIndex].selectCount = ''
                 })
             } )
 
             return clearedModel
         })
+
     }
 
     const selectColumn = (colNum) => {
+        const count = props.getMarkCount()
+
         setTableModel( (prevModel) => {
             let updatedModel = Array.from( prevModel )
 
@@ -51,6 +58,7 @@ const TableWithModel = (props) => {
                 row.forEach( (cell, cellIndex) => {
                     if (cellIndex === colNum) {
                         cell.selected = true
+                        updatedModel[rowIndex][cellIndex].selectCount = count
                     }
                 })
             });
@@ -68,11 +76,13 @@ const TableWithModel = (props) => {
     }
 
     const selectRow = (rowNum) => {
+        const count = props.getMarkCount()
         setTableModel( (prevModel) => {
             let updatedModel = Array.from( prevModel )
 
             updatedModel[rowNum].forEach( (element, index) => {
                 updatedModel[rowNum][index].selected = true
+                updatedModel[rowNum][index].selectCount = count
             });
 
             return updatedModel
@@ -90,6 +100,7 @@ const TableWithModel = (props) => {
     const pureSelectionListener = ({ target }) => {
         if( (target.dataset.col === '0') && (target.dataset.row === '0')){
             clearSelection()
+            props.resetCount()
             return
         }
 ///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
@@ -119,8 +130,6 @@ const headerRowsCount = 4
                 toggleColumns(colNum, target.colSpan)
             }
         }
-
-        addMarkHandler(target)
     }
 
 
@@ -172,28 +181,8 @@ const headerRowsCount = 4
         }   
     }
   
-//     const cellClickHandler = ({ target }) => {
-//         console.log(' CLICK : ', target)
-// ///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
-// ///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
-// ///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
-//         const headerRowsCount = 4
-// ///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
-// ///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!        
-// ///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!        
-        
-//         const rowNum = target.dataset.row
-//         // const rowSpan = target.rowSpan
-    
-//         if (rowNum > headerRowsCount - 1){
-//             toggleRows(rowNum, target.rowSpan)
-//         } else {
-//             console.log(' HEADER ')
-//             const colNum = Number(target.dataset.col)
-//             toggleColumns(colNum, target.colSpan)
-//         }
-    
-//     }
+
+
 
 
 
@@ -201,21 +190,9 @@ const headerRowsCount = 4
    
 
 
-    const test = () => {
-        
-        const table = document.getElementsByTagName('table')
 
-        const cell = table[0].childNodes[0].childNodes[0]
-        console.log(cell)
 
-        const mark = props.getMark()
-        console.log(mark)
 
-        cell.appendChild(mark)
-    }
-
-    
-    /////////////////////
 
 
 
@@ -233,7 +210,13 @@ const headerRowsCount = 4
             selectedClass = `cell ${tableModel[cellRow][cellCol].selected ? 'selected' : ''}`        
         }
 
-        
+        const marker = (tableModel[cellRow][cellCol].selectCount) ? 
+            (
+                <div className="marker">
+                    {tableModel[cellRow][cellCol].selectCount}
+                </div>
+            ) : null
+
         const cellElement = 
              (tableModel[cellRow][cellCol].visible) ? 
                 (   <td className={selectedClass}
@@ -242,8 +225,8 @@ const headerRowsCount = 4
 
 /// add separated Listeners for header and data areas ???                         
                         // onClick = { (props.row > 3) ? (e) => cellClickHandler(e) : null }
-                        onClick = {(e) => addMarkHandler(e.target)}
-                            // pureSelectionListener(e) }
+                        onClick = {(e) => //addMarkHandler(e.target)}
+                            pureSelectionListener(e) }
 /// add separated Listeners for header and data areas ??? 
 
 
@@ -252,7 +235,9 @@ const headerRowsCount = 4
                         colSpan= {cellColSpan}
                         rowSpan= {cellRowSpan}
                     >
-                        {tableModel[cellRow][cellCol].textContent}    
+                        {tableModel[cellRow][cellCol].textContent}  
+                        {marker}
+                        
                     </td> )
                     : null 
 
@@ -292,29 +277,7 @@ const headerRowsCount = 4
 
 
     const addMarkHandler = (target) => {
-        const mark = props.getMark()
-        
-        console.log('Target: ', target)
-        console.log('Mark  : ', mark)
-
-      const markContainer = document.createElement('div')
-
-      markContainer.style.border = '1px solid black'
-      markContainer.style.borderRadius = '5px';
-      markContainer.style.backgroundColor='wheat'
-      markContainer.style.width = '100%';
-      markContainer.style.height = '100%';
-
-      markContainer.style.position = 'absolute'
-      markContainer.style.top = '0'
-      markContainer.style.left = '0'
-
-        
-      markContainer.appendChild(mark)
-
-
-        target.appendChild(mark)
-        
+        console.log('Add Mark handler ', target )
     }
 
 
@@ -329,7 +292,7 @@ const headerRowsCount = 4
                 })}
             </table>
         
-            <button onClick={()=>test()} style={{marginRight: '27px'}}>TEST</button>
+            {/* <button onClick={()=>test()} style={{marginRight: '27px'}}>TEST</button> */}
             
             <button onClick={()=>tableContentHide()}>ON | OFF CONTENT</button>
         

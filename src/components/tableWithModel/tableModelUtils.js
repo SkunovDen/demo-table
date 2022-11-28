@@ -1,6 +1,5 @@
 export const getModelFromHtml = (htmlTable) => {
-    // console.log('Input HTML: ', htmlTable) 
-    
+
     const tableRows = htmlTable.rows
     
 
@@ -11,18 +10,15 @@ export const getModelFromHtml = (htmlTable) => {
     }
     const tableColsCount = tableRows[ rowCounter ].cells.length
     const tableRowsCount = tableRows.length
-    // const tableHeaderRowsCount = rowCounter
-
-    // console.log('COLS: ', tableColsCount)
-    // console.log('ROWS: ', tableRowsCount)
-    // console.log('HEADER ROWS: ', tableHeaderRowsCount)
 
 // create empty initial model array
     let initialModel = []
     for (let rowIndex = 0; rowIndex < tableRowsCount; rowIndex++) {
         let tempRow = []
         for (let colIndex = 0; colIndex < tableColsCount;  colIndex++) {
-            tempRow.push ( {visible : false} )
+            tempRow.push ( {
+                visible : false
+                })
         }
         initialModel.push( tempRow )
     }
@@ -47,10 +43,11 @@ export const getModelFromHtml = (htmlTable) => {
                     X: cellX, 
                     Y: cellY,
                     textContent : textContent,
-                    colSpan : cell.colSpan,
+                    colSpan  : cell.colSpan,
                     rowSpan  : cell.rowSpan,
                     selected : false,
-                    visible: true
+                    visible  : true,
+                    selectCount : ''
                 }
 
                 initialModel[cellY][cellX] = content

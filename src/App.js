@@ -7,56 +7,41 @@ import loadNewTable from './data/NewTable'
 
  
 function App() {
-  const [selectCount, setSelectCount] = useState(0)
-  
-  const incSelectCount = () => {
-    console.log(' INC ')
-    setSelectCount( (prev) => {
-      const upd = Number(prev) + 1
-      console.log('PREV ', prev,    'UPD: ', upd)
-      return ( upd )
-    })
-    console.log('INCd:', selectCount)
-  }
 
-  const getMark = () => {
-    incSelectCount();
+  const [selectCount, setSelectCount] = useState(1)
 
-    // const d = document.createElement('div')
+    const incCount = () => {
+      console.log(' INC ')
+      setSelectCount( (prev) => {
+        const upd = (Number(prev)+1)
+        console.log('PREV ', prev,    'UPD: ', upd)
+        return (upd )
+      })
 
-    // d.style.backgroundColor = 'yellow'
-    // d.style.border = '1px solid black'
-    // d.style.margin = '3px'
+    }
 
-    // d.textContent = `${count}`
+    const resetCount = () => {
+      console.log('reset')
+      setSelectCount( (prev) => {
+        return (1)
+      })
+
+    }
+
+    const getMarkCount = () => {
+      incCount();
+
+      return selectCount
+    }
 
 
-    const mark = document.createElement('div')
-
-    mark.style.border = '1px solid black'
-    mark.style.borderRadius = '5px';
-    mark.style.backgroundColor='yellow'
-    mark.style.width = '50px';
-    mark.style.height = '50px';
-
-    mark.style.position = 'absolute'
-    mark.style.top = '0'
-    mark.style.left = '0'
-
-    // console.log('Mark count: ', selectCount)
-    mark.textContent = `${selectCount}`
-
-// console.log('D: ', d)
-console.log('M: ', mark)
-
-    return mark
-  }
-  
 
   return (
     <div className="App">
 
-      <TableWithModel tableHtml={loadNewTable()} getMark={getMark} />
+      <TableWithModel tableHtml={loadNewTable()} 
+                      getMarkCount={getMarkCount}
+                      resetCount={resetCount} />
       
       {/* <div style={{minHeight : '2vh'}}></div>
       <TableWithModel tableHtml={loadOldTable()}/> */}
