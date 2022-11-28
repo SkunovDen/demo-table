@@ -119,6 +119,8 @@ const headerRowsCount = 4
                 toggleColumns(colNum, target.colSpan)
             }
         }
+
+        addMarkHandler(target)
     }
 
 
@@ -200,10 +202,16 @@ const headerRowsCount = 4
 
 
     const test = () => {
-        clearSelection()
+        
+        const table = document.getElementsByTagName('table')
 
-        // selectRow(6)
+        const cell = table[0].childNodes[0].childNodes[0]
+        console.log(cell)
 
+        const mark = props.getMark()
+        console.log(mark)
+
+        cell.appendChild(mark)
     }
 
     
@@ -234,7 +242,8 @@ const headerRowsCount = 4
 
 /// add separated Listeners for header and data areas ???                         
                         // onClick = { (props.row > 3) ? (e) => cellClickHandler(e) : null }
-                        onClick = {(e) => pureSelectionListener(e) }
+                        onClick = {(e) => addMarkHandler(e.target)}
+                            // pureSelectionListener(e) }
 /// add separated Listeners for header and data areas ??? 
 
 
@@ -279,6 +288,33 @@ const headerRowsCount = 4
         if ( e.key === 'Control'){
             setIsCtrlDown( (prev) => { return false})
         }
+    }
+
+
+    const addMarkHandler = (target) => {
+        const mark = props.getMark()
+        
+        console.log('Target: ', target)
+        console.log('Mark  : ', mark)
+
+      const markContainer = document.createElement('div')
+
+      markContainer.style.border = '1px solid black'
+      markContainer.style.borderRadius = '5px';
+      markContainer.style.backgroundColor='wheat'
+      markContainer.style.width = '100%';
+      markContainer.style.height = '100%';
+
+      markContainer.style.position = 'absolute'
+      markContainer.style.top = '0'
+      markContainer.style.left = '0'
+
+        
+      markContainer.appendChild(mark)
+
+
+        target.appendChild(mark)
+        
     }
 
 
