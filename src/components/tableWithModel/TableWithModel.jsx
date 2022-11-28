@@ -184,18 +184,6 @@ const headerRowsCount = 4
 
 
 
-
-
-
-   
-
-
-
-
-
-
-
-
     const Cell = (props) => {
         const cellCol = props.col
         const cellRow = props.row
@@ -276,9 +264,7 @@ const headerRowsCount = 4
     }
 
 
-    const addMarkHandler = (target) => {
-        console.log('Add Mark handler ', target )
-    }
+
 
 
     return(
