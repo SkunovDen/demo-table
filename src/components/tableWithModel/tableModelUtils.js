@@ -63,10 +63,7 @@ export const getModelFromHtml = (htmlTable) => {
 }
 
 
-
-
 export const checkCellIndex = (cell) => {
-
     let table = cell.parentElement.closest("table");
     
     let grid = [];
@@ -82,41 +79,20 @@ export const checkCellIndex = (cell) => {
     
         for(let cx = 0; cx < Math.max(1,currentCell.colSpan|0); cx++) {
             for(let rx = 0; rx < Math.max(1,currentCell.rowSpan|0); rx++) {
-            let gridRowToUpdate = grid[i+rx] || (grid[i+rx] = []);
-            gridRowToUpdate[c+cx] = gridRowToUpdate[c+cx] || currentCell;
+                let gridRowToUpdate = grid[i+rx] || (grid[i+rx] = []);
+                gridRowToUpdate[c+cx] = gridRowToUpdate[c+cx] || currentCell;
+                }
             }
-        }
         }
     }
     
     for(let rx = 0; rx < grid.length; rx++) {
         for(let cx = 0; cx < grid[rx].length; cx++) {
-    
-        if(grid[rx][cx] === cell) {
-            let x = [];
-            for (let i = 1; i <= cell.colSpan; i++) x.push(cx + i);
-            return {x: x, y: (1+rx)};
-        }
-        }
-    }
-}
-
-export const isMergedSelected = (tableModel, colNum, rowNum, colSpan, rowSpan) => {
-    // console.log('IS SELECTED CHECK : ', colNum, ' ', rowNum, '   ROWSPAN : ', rowSpan)
-     
-    const startCol = colNum
-    const endCol = Number(colNum) + colSpan
-    const startRow = rowNum
-    const endRow = Number(rowNum) + rowSpan
-
-    let result = false
-    
-    for (let col = startCol; col < endCol; col++) {
-        for (let row = startRow; row < endRow; row++) {
-            // console.log('CHECK : X=', col, '   Y=', row) 
-            result = result || tableModel[row][col].selected            
+            if(grid[rx][cx] === cell) {
+                let x = [];
+                for (let i = 1; i <= cell.colSpan; i++) x.push(cx + i);
+                return {x: x, y: (1 + rx)};
+            }
         }
     }
-
-    return result
 }
