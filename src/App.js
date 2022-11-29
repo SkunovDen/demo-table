@@ -29,7 +29,7 @@ function App() {
     }
 
     const getMarkCount = () => {
-      incCount();
+      // incCount();
 
       return selectCount
     }

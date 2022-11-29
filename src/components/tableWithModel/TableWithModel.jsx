@@ -189,18 +189,21 @@ const headerRowsCount = 4
 ///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!        
         
         const rowNum = target.dataset.row
-        
+        const isHeader= (row) => {
+            return (row > headerRowsCount - 1)
+        }
+
         if ( !isCtrlDown ){ 
             clearSelection()
         
-            if (rowNum > headerRowsCount - 1){
+            if ( isHeader(rowNum) ){
                 selectRows(rowNum, target.rowSpan)
             } else {
                 const colNum = Number(target.dataset.col)
                 selectColumns(colNum, target.colSpan)
             }
         } else {
-            if (rowNum > headerRowsCount - 1){
+            if ( isHeader(rowNum) ){
                 toggleRows(rowNum, target.rowSpan)
             } else {
                 const colNum = Number(target.dataset.col)
