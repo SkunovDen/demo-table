@@ -220,8 +220,7 @@ const headerRowsCount = 4
 
 
     const isOneOfMergedSelected = (tableModel, colNum, rowNum, colSpan, rowSpan) => {
-        // console.log('IS SELECTED CHECK : ', colNum, ' ', rowNum, '   ROWSPAN : ', rowSpan)
-        
+
         const startCol = colNum
         const endCol = Number(colNum) + colSpan
         const startRow = rowNum
@@ -230,8 +229,7 @@ const headerRowsCount = 4
         let result = false
         
         for (let col = startCol; col < endCol; col++) {
-            for (let row = startRow; row < endRow; row++) {
-                // console.log('CHECK : X=', col, '   Y=', row) 
+            for (let row = startRow; row < endRow; row++) { 
                 result = result || tableModel[row][col].selected            
             }
         }
@@ -245,15 +243,14 @@ const headerRowsCount = 4
         const cellColSpan = tableModel[props.row][props.col].colSpan
         const cellRowSpan = tableModel[props.row][props.col].rowSpan
 
-// selected one of 'back' cells
-        let selectedClass
-        if ( (cellRowSpan > 1) || (cellColSpan > 1) ){
-            selectedClass = `cell ${isOneOfMergedSelected(tableModel, cellCol, cellRow, cellColSpan, cellRowSpan) ? 'selected' : ''}`  
-        } else {
-            selectedClass = `cell ${tableModel[cellRow][cellCol].selected ? 'selected' : ''}`        
-        }
-
-
+// Check if selected one of 'merged' cells 
+// show cell as selected (add higlight style class)
+        const cellClass = ( (cellRowSpan > 1) || (cellColSpan > 1) ) ? 
+                `cell ${isOneOfMergedSelected(tableModel, cellCol, cellRow, cellColSpan, cellRowSpan) ? 'selected' : ''}`  
+              : `cell ${tableModel[cellRow][cellCol].selected ? 'selected' : ''}`        
+            
+        const cellText = tableModel[cellRow][cellCol].textContent
+        
         const marker = 
             tableModel[cellRow][cellCol].selectCount ? 
             (
@@ -264,23 +261,16 @@ const headerRowsCount = 4
 
         const cellElement = 
              (tableModel[cellRow][cellCol].visible) ? 
-                (   <td className={selectedClass}
-                        style={{ padding: '5px 10px'}}
-
-
-/// add separated Listeners for header and data areas ???                         
-                        // onClick = { (props.row > 3) ? (e) => cellClickHandler(e) : null }
-                        onClick = {(e) => //addMarkHandler(e.target)}
-                            pureSelectionListener(e) }
-/// add separated Listeners for header and data areas ??? 
-
+                (   <td className={cellClass}
+                         
+                        onClick = {(e) => pureSelectionListener(e) }
 
                         data-col={cellCol}
                         data-row={cellRow}
                         colSpan= {cellColSpan}
                         rowSpan= {cellRowSpan}
                     >
-                        {tableModel[cellRow][cellCol].textContent}  
+                        {cellText}  
                         {marker}
                         
                     </td> )
