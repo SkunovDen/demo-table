@@ -242,13 +242,13 @@ const headerRowsCount = 4
             
         const cellText = tableModel[cellRow][cellCol].textContent
         
-        const marker = 
-            tableModel[cellRow][cellCol].selectCount ? 
-            (
-                <div className="marker">
-                    {tableModel[cellRow][cellCol].selectCount}
-                </div>
-            ) : null
+        // const marker = 
+        //     tableModel[cellRow][cellCol].selectCount ? 
+        //     (
+        //         <div className="marker">
+        //             {tableModel[cellRow][cellCol].selectCount}
+        //         </div>
+        //     ) : null
 
         const cellElement = 
              (tableModel[cellRow][cellCol].visible) ? 
@@ -312,25 +312,25 @@ const headerRowsCount = 4
         t_container.style.color = t_container.style.color === 'white' ? 'black' : 'white' 
     }
 
-    const test1 = () => {
-        console.log('Test: ==============================')
-        props.resetMarkCount();
-        let c = props.getMarkCount()
-        console.log('Count : ', c)
+    // const test1 = () => {
+    //     console.log('Test: ==============================')
+    //     props.resetMarkCount();
+    //     let c = props.getMarkCount()
+    //     console.log('Count : ', c)
         
         
-        console.log('Test: ==============================')
-    }
+    //     console.log('Test: ==============================')
+    // }
 
-    const test2 = () => {
-        console.log('Test: ==============================')
-        props.incMarkCount()
+    // const test2 = () => {
+    //     console.log('Test: ==============================')
+    //     props.incMarkCount()
         
-        let c = props.getMarkCount()
-        console.log('Count : ', c)
+    //     let c = props.getMarkCount()
+    //     console.log('Count : ', c)
         
-        console.log('Test: ==============================')
-    }
+    //     console.log('Test: ==============================')
+    // }
 
 //** temporary utils section  END*/
 //** *********************************************** */
