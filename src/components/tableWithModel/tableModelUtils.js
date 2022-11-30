@@ -36,7 +36,7 @@ export const getModelFromHtml = (htmlTable) => {
             (cell, cellIndex) => {
                 const cellCoords = checkCellIndex ( cell )
                 const cellX = cellCoords.x[0] - 1
-                const cellY = cellCoords.y -1
+                const cellY = cellCoords.y - 1
                 const textContent = cell.textContent
                 
                 const content =  {
@@ -45,20 +45,19 @@ export const getModelFromHtml = (htmlTable) => {
                     textContent : textContent,
                     colSpan  : cell.colSpan,
                     rowSpan  : cell.rowSpan,
-                    selected : false,
+
                     visible  : true,
-                    selectCount : ''
+                    selectCount : '',
+
+                    selectLevel: 0
                 }
 
                 initialModel[cellY][cellX] = content
-
-                const isSelected = initialModel[cellY][cellX].selected 
-                cell.className = isSelected ? 'selected' :'' 
             }
         )
 
     })
-    
+
     return initialModel
 }
 

@@ -29,9 +29,15 @@ const headerRowsCount = 4
             template.innerHTML = html;
             const table = template.firstChild
             
-            setTableModel( prev => { return  getModelFromHtml(table) } )
+            setTableModel( prev => {
+                const tableModel = getModelFromHtml(table) 
+
+    // get header rows coun here ?
+                console.log('EFFECT:  ROWS', tableModel.length, '  COLS: ', tableModel[0].length)
+                return  tableModel } )
         }
         createModel()
+        
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
@@ -48,13 +54,13 @@ const headerRowsCount = 4
     }, []);
 
     const keyDownHandler = (e) => {
-        if ( e.key === 'Control'){
+        if (( e.key === 'Control') || (window.navigator.platform.startsWith("Mac") && e.metaKey))  {
             setIsCtrlDown( (prev) => { return true })
         }
     }
 
     const keyReleaseHandler = (e) => {
-        if ( e.key === 'Control'){
+        if (( e.key === 'Control') || (window.navigator.platform.startsWith("Mac") && e.metaKey)){
             setIsCtrlDown( (prev) => { return false })
         }
     }
@@ -69,14 +75,13 @@ const headerRowsCount = 4
 //** Click on TABLE handling section */
 
     const clearSelection = () => {
-        console.log('CLEAR SELECTION')
         setTableModel( (prev) => {
             const clearedModel = Array.from( prev )
 
             clearedModel.forEach( (row, rowIndex) => {
                 row.forEach( (cell, cellIndex) => {
                     clearedModel[rowIndex][cellIndex].selected = false
-                    clearedModel[rowIndex][cellIndex].selectCount = ''
+                    clearedModel[rowIndex][cellIndex].selectLevel = 0
                 })
             } )
 
@@ -85,17 +90,17 @@ const headerRowsCount = 4
 
     }
 
-    const setColumnSelectedState = (columnNum, selectedState) => {
-        const countMarker = props.getMarkCount()
-
+    const columnSelectLevelUp = (columnNum) => {
         setTableModel( (prevModel) => {
             let updatedModel = Array.from( prevModel )
 
             updatedModel.forEach( (row, rowIndex) => {   
                 row.forEach( (cell, cellIndex) => {
                     if (cellIndex === columnNum) {
-                        cell.selected = selectedState
-                        updatedModel[rowIndex][cellIndex].selectCount = countMarker
+                        let updatedLevel = cell.selectLevel + 1
+                        if (updatedLevel > 2) { updatedLevel = 2 }
+                        
+                        cell.selectLevel = updatedLevel
                     }
                 })
             });
@@ -104,89 +109,203 @@ const headerRowsCount = 4
         })
     }
 
-    const setColumnsSelectedState = (clickedTarget, selectedState) => {
-
-        const startColumn = Number(clickedTarget.dataset.col)
-        const columnsCount = Number(clickedTarget.colSpan)
-
-        const endColumn = startColumn + columnsCount
-
-        for (let columnNum = startColumn; columnNum < endColumn; columnNum ++){
-            setColumnSelectedState( columnNum, selectedState )
-        }   
-    }
-
-    const setRowSelectedState = (rowNum, selectedState) => {
-        const count = props.getMarkCount()
-        
+    const columnSelectLevelDown = (columnNum) => {
         setTableModel( (prevModel) => {
             let updatedModel = Array.from( prevModel )
 
-            updatedModel[rowNum].forEach( (element, index) => {
-                updatedModel[rowNum][index].selected = selectedState
-                updatedModel[rowNum][index].selectCount = count
+            updatedModel.forEach( (row, rowIndex) => {   
+                row.forEach( (cell, cellIndex) => {
+                    if (cellIndex === columnNum) {
+                        let updatedLevel = cell.selectLevel - 1
+                        if (updatedLevel < 0) { updatedLevel = 0 }
+                        
+                        cell.selectLevel = updatedLevel
+                    }
+                })
             });
 
             return updatedModel
         })
     }
 
-    const setRowsSelectedState = (clickedTarget, selectedState) => {
+    const rowSelectLevelUp = (rowNum) => {
+        setTableModel( (prevModel) => {
+            let updatedModel = Array.from( prevModel )
+
+            updatedModel[rowNum].forEach( (element, index) => {
+                let updatedLevel = updatedModel[rowNum][index].selectLevel + 1
+                if (updatedLevel > 2) { updatedLevel = 2 }
+                
+                updatedModel[rowNum][index].selectLevel = updatedLevel
+            });
+
+            return updatedModel
+        })
+    }
+    
+    const rowSelectLevelDown = (rowNum) => {
+        setTableModel( (prevModel) => {
+            let updatedModel = Array.from( prevModel )
+
+            updatedModel[rowNum].forEach( (element, index) => {
+                let updatedLevel = updatedModel[rowNum][index].selectLevel - 1
+                if (updatedLevel < 0) { updatedLevel = 0 }
+                
+                updatedModel[rowNum][index].selectLevel = updatedLevel
+            });
+
+            return updatedModel
+        })
+    }
+
+
+    const setSelectLevelUp2Columns = (clickedTarget) => {
+        const startColumn = Number(clickedTarget.dataset.col)
+        const columnsCount = Number(clickedTarget.colSpan)
+
+        const endColumn = startColumn + columnsCount
+
+        for (let columnNum = startColumn; columnNum < endColumn; columnNum ++){
+            columnSelectLevelUp( columnNum )
+        }   
+    }
+
+    const setSelectLevelDown2Columns = (clickedTarget) => {
+        const startColumn = Number(clickedTarget.dataset.col)
+        const columnsCount = Number(clickedTarget.colSpan)
+
+        const endColumn = startColumn + columnsCount
+
+        for (let columnNum = startColumn; columnNum < endColumn; columnNum ++){
+            columnSelectLevelDown( columnNum )
+        }
+    }
+
+
+
+    const setSelectLevelUp2Rows = (clickedTarget) => {
         const startRow = Number( clickedTarget.dataset.row)
         const rowsCount = Number(clickedTarget.rowSpan)
 
         const endRow = Number(startRow) + Number(rowsCount)
 
         for (let rowNum = startRow; rowNum < endRow; rowNum ++){
-            setRowSelectedState( rowNum, selectedState )
-        }   
+            rowSelectLevelUp( rowNum )
+        } 
     }
 
+    const setSelectLevelDown2Rows = (clickedTarget) => {
+        const startRow = Number( clickedTarget.dataset.row)
+        const rowsCount = Number(clickedTarget.rowSpan)
+
+        const endRow = Number(startRow) + Number(rowsCount)
+
+        for (let rowNum = startRow; rowNum < endRow; rowNum ++){
+            rowSelectLevelDown( rowNum )
+        } 
+    }
+
+    ////////////////////////////
+
+    // const setColumnSelectedState = (columnNum, selectedState) => {
+
+    //     setTableModel( (prevModel) => {
+    //         let updatedModel = Array.from( prevModel )
+
+    //         updatedModel.forEach( (row, rowIndex) => {   
+    //             row.forEach( (cell, cellIndex) => {
+    //                 if (cellIndex === columnNum) {
+    //                     // cell.selected = selectedState
+    //                     cell.selectLevel = selectedState ? 1 : 0
+    //                 }
+    //             })
+    //         });
+
+    //         return updatedModel
+    //     })
+    // }
+
+    // const setColumnsSelectedState = (clickedTarget, selectedState) => {
+
+    //     const startColumn = Number(clickedTarget.dataset.col)
+    //     const columnsCount = Number(clickedTarget.colSpan)
+
+    //     const endColumn = startColumn + columnsCount
+
+    //     for (let columnNum = startColumn; columnNum < endColumn; columnNum ++){
+    //         setColumnSelectedState( columnNum, selectedState )
+    //     }   
+    // }
+
+    // const setRowSelectedState = (rowNum, selectedState) => {
+        
+    //     setTableModel( (prevModel) => {
+    //         let updatedModel = Array.from( prevModel )
+
+    //         updatedModel[rowNum].forEach( (element, index) => {
+    //             updatedModel[rowNum][index].selected = selectedState
+    //             updatedModel[rowNum][index].selectLevel = selectedState ? 1 : 0
+    //         });
+
+    //         return updatedModel
+    //     })
+    // }
+
+    // const setRowsSelectedState = (clickedTarget, selectedState) => {
+    //     const startRow = Number( clickedTarget.dataset.row)
+    //     const rowsCount = Number(clickedTarget.rowSpan)
+
+    //     const endRow = Number(startRow) + Number(rowsCount)
+
+    //     for (let rowNum = startRow; rowNum < endRow; rowNum ++){
+    //         setRowSelectedState( rowNum, selectedState )
+    //     }   
+    // }
 
 
-
-
+    
     const select = (target) => {
-        console.log('SELECT')
-        const isHeader = (target.dataset.row > headerRowsCount - 1)
-        props.resetMarkCount();
-
- 
         clearSelection();
         
+        const isHeader = (target.dataset.row < headerRowsCount )
         if ( isHeader ){
-            setRowsSelectedState(target, true)
+            setSelectLevelUp2Columns(target)
         } else {
-            setColumnsSelectedState(target, true)
+            setSelectLevelUp2Rows(target)
         }
-        props.incMarkCount()
     }
 
+
+
     const addToSelected = (target) => {
-        console.log('ADD TO SELECT')
-
-        const isHeader = (target.dataset.row > headerRowsCount - 1)
-        props.incMarkCount();
-
-
-
         const targetCol = target.dataset.col
         const targetRow = target.dataset.row
-        const currentSelectionState =  tableModel[targetRow][targetCol].selected
+
+        const currentSelectLevel =  tableModel[targetRow][targetCol].selectLevel
+
+        const isHeader = (target.dataset.row < headerRowsCount )
 
         if ( isHeader ){
-            setRowsSelectedState(target, !currentSelectionState)
+            if (currentSelectLevel > 0) {
+                setSelectLevelDown2Columns(target)
+            } else {
+                setSelectLevelUp2Columns(target)
+            }
         } else {
-            setColumnsSelectedState(target, !currentSelectionState)
+            if (currentSelectLevel > 0) {
+                setSelectLevelDown2Rows(target)
+            } else {
+                setSelectLevelUp2Rows(target)
+            }
         }
     }
 
     const pureSelectionListener = ({ target }) => {
-        console.log('Click')
+        // console.log('Click')
         ///temporary clear selection / will be ignore click  
         if( (target.dataset.col === '0') && (target.dataset.row === '0')){
             clearSelection()
-            props.resetMarkCount()
+
             return
         }
 
@@ -209,65 +328,81 @@ const headerRowsCount = 4
 //** *********************************************** */
 //** Generate TABLE ELEMENT HTML section  */
 
+    // const checkCellSelectLevel = (cell) => {
+    //     const startCol = cell.X
+    //     const endCol =  startCol + cell.colSpan
+    //     const startRow = cell.Y
+    //     const endRow = startRow + cell.rowSpan
 
-    const isOneOfMergedSelected = (tableModel, colNum, rowNum, colSpan, rowSpan) => {
-
-        const startCol = colNum
-        const endCol = Number(colNum) + colSpan
-        const startRow = rowNum
-        const endRow = Number(rowNum) + rowSpan
-
-        let result = false
+    //     let result = 0
         
-        for (let col = startCol; col < endCol; col++) {
-            for (let row = startRow; row < endRow; row++) { 
-                result = result || tableModel[row][col].selected            
+    //     for (let col = startCol; col < endCol; col++) {
+    //         for (let row = startRow; row < endRow; row++) { 
+    //             if (tableModel[row][col].selectLevel > 0) {
+    //                 result = 1
+    //             }
+    //         }
+    //     }
+
+    //     return result 
+    // }
+
+    const getCellClass = (cell) => {
+        const cellLevel = cell.selectLevel
+        let className;
+        switch (cellLevel) {
+            case 0: {
+                className = 'cell';
+                break;
+            }
+            case 1: {
+                className = 'cell selected' 
+                break;
+            }
+            case 2: {
+                className = 'cell selected2';
+                break;
+            }
+            default: {
+                className = 'cell'
             }
         }
 
-        return result
+        return className
     }
 
     const Cell = (props) => {
         const cellCol = props.col
         const cellRow = props.row
+
+        if (!tableModel[cellRow][cellCol].visible){
+            return null
+        }
+
+        const cellClass = getCellClass( tableModel[cellRow][cellCol] )
+
+
         const cellColSpan = tableModel[props.row][props.col].colSpan
         const cellRowSpan = tableModel[props.row][props.col].rowSpan
-
-// Check if selected one of 'merged' cells 
-// show cell as selected (add higlight style class)
-        const cellClass = ( (cellRowSpan > 1) || (cellColSpan > 1) ) ? 
-                `cell ${isOneOfMergedSelected(tableModel, cellCol, cellRow, cellColSpan, cellRowSpan) ? 'selected' : ''}`  
-              : `cell ${tableModel[cellRow][cellCol].selected ? 'selected' : ''}`        
-            
+        
         const cellText = tableModel[cellRow][cellCol].textContent
         
-        // const marker = 
-        //     tableModel[cellRow][cellCol].selectCount ? 
-        //     (
-        //         <div className="marker">
-        //             {tableModel[cellRow][cellCol].selectCount}
-        //         </div>
-        //     ) : null
-
         const cellElement = 
-             (tableModel[cellRow][cellCol].visible) ? 
-                (   <td className={cellClass}
-                         
-                        onClick = {(e) => pureSelectionListener(e) }
+            <td className={cellClass}
+                    
+                onClick = {(e) => pureSelectionListener(e) }
 
-                        data-col={cellCol}
-                        data-row={cellRow}
-                        colSpan= {cellColSpan}
-                        rowSpan= {cellRowSpan}
-                    >
-                        {cellText}  
+                data-col={cellCol}
+                data-row={cellRow}
+                colSpan= {cellColSpan}
+                rowSpan= {cellRowSpan}
+            >
+                {cellText}  
+        
+                {/* {marker} */}
+        
                 
-                        {/* {marker} */}
-                
-                        
-                    </td> )
-                    : null 
+            </td> 
 
         return cellElement
     }
