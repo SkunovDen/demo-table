@@ -1,6 +1,5 @@
 export const getModelFromHtml = (htmlTable) => {
-    // console.log('Input HTML: ', htmlTable) 
-    
+
     const tableRows = htmlTable.rows
     
 
@@ -11,18 +10,15 @@ export const getModelFromHtml = (htmlTable) => {
     }
     const tableColsCount = tableRows[ rowCounter ].cells.length
     const tableRowsCount = tableRows.length
-    // const tableHeaderRowsCount = rowCounter
-
-    // console.log('COLS: ', tableColsCount)
-    // console.log('ROWS: ', tableRowsCount)
-    // console.log('HEADER ROWS: ', tableHeaderRowsCount)
 
 // create empty initial model array
     let initialModel = []
     for (let rowIndex = 0; rowIndex < tableRowsCount; rowIndex++) {
         let tempRow = []
         for (let colIndex = 0; colIndex < tableColsCount;  colIndex++) {
-            tempRow.push ( {visible : false} )
+            tempRow.push ( {
+                visible : false
+                })
         }
         initialModel.push( tempRow )
     }
@@ -47,10 +43,11 @@ export const getModelFromHtml = (htmlTable) => {
                     X: cellX, 
                     Y: cellY,
                     textContent : textContent,
-                    colSpan : cell.colSpan,
+                    colSpan  : cell.colSpan,
                     rowSpan  : cell.rowSpan,
                     selected : false,
-                    visible: true
+                    visible  : true,
+                    selectCount : ''
                 }
 
                 initialModel[cellY][cellX] = content
@@ -66,10 +63,7 @@ export const getModelFromHtml = (htmlTable) => {
 }
 
 
-
-
 export const checkCellIndex = (cell) => {
-
     let table = cell.parentElement.closest("table");
     
     let grid = [];
@@ -85,41 +79,20 @@ export const checkCellIndex = (cell) => {
     
         for(let cx = 0; cx < Math.max(1,currentCell.colSpan|0); cx++) {
             for(let rx = 0; rx < Math.max(1,currentCell.rowSpan|0); rx++) {
-            let gridRowToUpdate = grid[i+rx] || (grid[i+rx] = []);
-            gridRowToUpdate[c+cx] = gridRowToUpdate[c+cx] || currentCell;
+                let gridRowToUpdate = grid[i+rx] || (grid[i+rx] = []);
+                gridRowToUpdate[c+cx] = gridRowToUpdate[c+cx] || currentCell;
+                }
             }
-        }
         }
     }
     
     for(let rx = 0; rx < grid.length; rx++) {
         for(let cx = 0; cx < grid[rx].length; cx++) {
-    
-        if(grid[rx][cx] === cell) {
-            let x = [];
-            for (let i = 1; i <= cell.colSpan; i++) x.push(cx + i);
-            return {x: x, y: (1+rx)};
-        }
-        }
-    }
-}
-
-export const isMergedSelected = (tableModel, colNum, rowNum, colSpan, rowSpan) => {
-    // console.log('IS SELECTED CHECK : ', colNum, ' ', rowNum, '   ROWSPAN : ', rowSpan)
-     
-    const startCol = colNum
-    const endCol = Number(colNum) + colSpan
-    const startRow = rowNum
-    const endRow = Number(rowNum) + rowSpan
-
-    let result = false
-    
-    for (let col = startCol; col < endCol; col++) {
-        for (let row = startRow; row < endRow; row++) {
-            // console.log('CHECK : X=', col, '   Y=', row) 
-            result = result || tableModel[row][col].selected            
+            if(grid[rx][cx] === cell) {
+                let x = [];
+                for (let i = 1; i <= cell.colSpan; i++) x.push(cx + i);
+                return {x: x, y: (1 + rx)};
+            }
         }
     }
-
-    return result
 }
