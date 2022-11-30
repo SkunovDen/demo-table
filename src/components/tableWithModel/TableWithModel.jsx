@@ -76,7 +76,6 @@ const headerRowsCount = 4
             clearedModel.forEach( (row, rowIndex) => {
                 row.forEach( (cell, cellIndex) => {
                     clearedModel[rowIndex][cellIndex].selected = false
-                    clearedModel[rowIndex][cellIndex].selectCount = ''
                 })
             } )
 
@@ -86,7 +85,6 @@ const headerRowsCount = 4
     }
 
     const setColumnSelectedState = (columnNum, selectedState) => {
-        const countMarker = props.getMarkCount()
 
         setTableModel( (prevModel) => {
             let updatedModel = Array.from( prevModel )
@@ -95,7 +93,6 @@ const headerRowsCount = 4
                 row.forEach( (cell, cellIndex) => {
                     if (cellIndex === columnNum) {
                         cell.selected = selectedState
-                        updatedModel[rowIndex][cellIndex].selectCount = countMarker
                     }
                 })
             });
@@ -117,14 +114,12 @@ const headerRowsCount = 4
     }
 
     const setRowSelectedState = (rowNum, selectedState) => {
-        const count = props.getMarkCount()
         
         setTableModel( (prevModel) => {
             let updatedModel = Array.from( prevModel )
 
             updatedModel[rowNum].forEach( (element, index) => {
                 updatedModel[rowNum][index].selected = selectedState
-                updatedModel[rowNum][index].selectCount = count
             });
 
             return updatedModel
@@ -143,14 +138,10 @@ const headerRowsCount = 4
     }
 
 
-
-
-
+    
     const select = (target) => {
         console.log('SELECT')
         const isHeader = (target.dataset.row > headerRowsCount - 1)
-        props.resetMarkCount();
-
  
         clearSelection();
         
@@ -166,9 +157,6 @@ const headerRowsCount = 4
         console.log('ADD TO SELECT')
 
         const isHeader = (target.dataset.row > headerRowsCount - 1)
-        props.incMarkCount();
-
-
 
         const targetCol = target.dataset.col
         const targetRow = target.dataset.row
@@ -186,7 +174,7 @@ const headerRowsCount = 4
         ///temporary clear selection / will be ignore click  
         if( (target.dataset.col === '0') && (target.dataset.row === '0')){
             clearSelection()
-            props.resetMarkCount()
+
             return
         }
 
@@ -242,14 +230,6 @@ const headerRowsCount = 4
             
         const cellText = tableModel[cellRow][cellCol].textContent
         
-        // const marker = 
-        //     tableModel[cellRow][cellCol].selectCount ? 
-        //     (
-        //         <div className="marker">
-        //             {tableModel[cellRow][cellCol].selectCount}
-        //         </div>
-        //     ) : null
-
         const cellElement = 
              (tableModel[cellRow][cellCol].visible) ? 
                 (   <td className={cellClass}
