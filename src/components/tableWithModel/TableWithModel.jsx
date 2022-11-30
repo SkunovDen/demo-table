@@ -9,6 +9,17 @@ const TableWithModel = (props) => {
     const [tableModel, setTableModel] = useState( [] )
     const [isCtrlDown, setIsCtrlDown] = useState(false)
 
+
+///  REMOVE HARD_CODE MAGIC NUMBER   !!!!!!!!!!!!!!!!!!
+/// REMOVE HARD___CODE MAGIC NUMBER  !!!!!!!!!!!!!!!!!!
+///REMOVE HARD_____CODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
+const headerRowsCount = 4
+///REMOVE HARD_____CODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
+/// REMOVE HARD___CODE MAGIC NUMBER  !!!!!!!!!!!!!!!!!!   
+///  REMOVE HARD_CODE MAGIC NUMBER   !!!!!!!!!!!!!!!!!! 
+
+
+
 //** Startup: create TABLE MODEL and add it to DOM */
     useEffect( () => {
         const createModel = () => {
@@ -58,7 +69,7 @@ const TableWithModel = (props) => {
 //** Click on TABLE handling section */
 
     const clearSelection = () => {
-
+        console.log('CLEAR SELECTION')
         setTableModel( (prev) => {
             const clearedModel = Array.from( prev )
 
@@ -74,17 +85,17 @@ const TableWithModel = (props) => {
 
     }
 
-    const selectColumn = (colNum) => {
-        const count = props.getMarkCount()
+    const setColumnSelectedState = (columnNum, selectedState) => {
+        const countMarker = props.getMarkCount()
 
         setTableModel( (prevModel) => {
             let updatedModel = Array.from( prevModel )
 
             updatedModel.forEach( (row, rowIndex) => {   
                 row.forEach( (cell, cellIndex) => {
-                    if (cellIndex === colNum) {
-                        cell.selected = true
-                        updatedModel[rowIndex][cellIndex].selectCount = count
+                    if (cellIndex === columnNum) {
+                        cell.selected = selectedState
+                        updatedModel[rowIndex][cellIndex].selectCount = countMarker
                     }
                 })
             });
@@ -93,21 +104,26 @@ const TableWithModel = (props) => {
         })
     }
 
-    const selectColumns = (startColumn, columnsCount ) => {
-        const endColumn = Number(startColumn) + Number(columnsCount)
+    const setColumnsSelectedState = (clickedTarget, selectedState) => {
 
-        for (let toglledColNum = startColumn; toglledColNum < endColumn; toglledColNum ++){
-            selectColumn( toglledColNum )
+        const startColumn = Number(clickedTarget.dataset.col)
+        const columnsCount = Number(clickedTarget.colSpan)
+
+        const endColumn = startColumn + columnsCount
+
+        for (let columnNum = startColumn; columnNum < endColumn; columnNum ++){
+            setColumnSelectedState( columnNum, selectedState )
         }   
     }
 
-    const selectRow = (rowNum) => {
+    const setRowSelectedState = (rowNum, selectedState) => {
         const count = props.getMarkCount()
+        
         setTableModel( (prevModel) => {
             let updatedModel = Array.from( prevModel )
 
             updatedModel[rowNum].forEach( (element, index) => {
-                updatedModel[rowNum][index].selected = true
+                updatedModel[rowNum][index].selected = selectedState
                 updatedModel[rowNum][index].selectCount = count
             });
 
@@ -115,11 +131,14 @@ const TableWithModel = (props) => {
         })
     }
 
-    const selectRows = (startRow, rowsCount ) => {
+    const setRowsSelectedState = (clickedTarget, selectedState) => {
+        const startRow = Number( clickedTarget.dataset.row)
+        const rowsCount = Number(clickedTarget.rowSpan)
+
         const endRow = Number(startRow) + Number(rowsCount)
 
-        for (let toglledRowNum = startRow; toglledRowNum < endRow; toglledRowNum ++){
-            selectRow( toglledRowNum )
+        for (let rowNum = startRow; rowNum < endRow; rowNum ++){
+            setRowSelectedState( rowNum, selectedState )
         }   
     }
 
@@ -127,90 +146,59 @@ const TableWithModel = (props) => {
 
 
 
+    const select = (target) => {
+        console.log('SELECT')
+        const isHeader = (target.dataset.row > headerRowsCount - 1)
+        props.resetMarkCount();
 
-    const toggleColumn = (colNum) => {
-        setTableModel( (prevModel) => {
-            let updatedModel = Array.from( prevModel )
-
-            updatedModel.forEach( (row, rowIndex) => {
-                
-                row.forEach( (cell, cellIndex) => {
-                    // console.log(cellIndex, ' :: ', rowIndex, ' :: ', cell)
-                    if (cellIndex === colNum) {
-                        cell.selected = !cell.selected
-                    }
-                })
-            });
-
-            return updatedModel
-        })
+ 
+        clearSelection();
+        
+        if ( isHeader ){
+            setRowsSelectedState(target, true)
+        } else {
+            setColumnsSelectedState(target, true)
+        }
+        props.incMarkCount()
     }
 
-    const toggleColumns = (startColumn, columnsCount ) => {
-        const endColumn = Number(startColumn) + Number(columnsCount)
+    const addToSelected = (target) => {
+        console.log('ADD TO SELECT')
 
-        for (let toglledColNum = startColumn; toglledColNum < endColumn; toglledColNum ++){
-            toggleColumn( toglledColNum )
-        }   
-    }
+        const isHeader = (target.dataset.row > headerRowsCount - 1)
+        props.incMarkCount();
 
-    const toggleRow = (rowNum) => {
-        setTableModel( (prevModel) => {
-            let updatedModel = Array.from( prevModel )
 
-            updatedModel[rowNum].forEach( (element, index) => {
-                updatedModel[rowNum][index].selected = !prevModel[rowNum][index].selected
-            });
 
-            return updatedModel
-        })
-    }
+        const targetCol = target.dataset.col
+        const targetRow = target.dataset.row
+        const currentSelectionState =  tableModel[targetRow][targetCol].selected
 
-    const toggleRows = (startRow, rowsCount ) => {
-        const endRow = Number(startRow) + Number(rowsCount)
-
-        for (let toglledRowNum = startRow; toglledRowNum < endRow; toglledRowNum ++){
-            toggleRow( toglledRowNum )
-        }   
+        if ( isHeader ){
+            setRowsSelectedState(target, !currentSelectionState)
+        } else {
+            setColumnsSelectedState(target, !currentSelectionState)
+        }
     }
 
     const pureSelectionListener = ({ target }) => {
+        console.log('Click')
+        ///temporary clear selection / will be ignore click  
         if( (target.dataset.col === '0') && (target.dataset.row === '0')){
             clearSelection()
-            props.resetCount()
+            props.resetMarkCount()
             return
-        }
-///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
-///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
-///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
-const headerRowsCount = 4
-///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!
-///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!        
-///REMOVE HARDCODE MAGIC NUMBER !!!!!!!!!!!!!!!!!!        
-        
-        const rowNum = target.dataset.row
-        const isHeader= (row) => {
-            return (row > headerRowsCount - 1)
         }
 
         if ( !isCtrlDown ){ 
-            clearSelection()
-        
-            if ( isHeader(rowNum) ){
-                selectRows(rowNum, target.rowSpan)
-            } else {
-                const colNum = Number(target.dataset.col)
-                selectColumns(colNum, target.colSpan)
-            }
+            console.log('Ctrl NOT DOWN')
+            select(target)
         } else {
-            if ( isHeader(rowNum) ){
-                toggleRows(rowNum, target.rowSpan)
-            } else {
-                const colNum = Number(target.dataset.col)
-                toggleColumns(colNum, target.colSpan)
-            }
+            console.log('Ctrl DOWN')
+            addToSelected(target)
         }
     }
+
 //** Click on TABLE handling section END*/
 //** *********************************************** */
 
@@ -274,7 +262,9 @@ const headerRowsCount = 4
                         rowSpan= {cellRowSpan}
                     >
                         {cellText}  
-                        {marker}
+                
+                        {/* {marker} */}
+                
                         
                     </td> )
                     : null 
@@ -297,7 +287,7 @@ const headerRowsCount = 4
         const tableModel = props.tableModel
         
         return(
-            <table border={1}>
+            <table border={1} cellpadding="0" cellspacing="0">
                 { tableModel.map( (_r, rowIndex) => {
                     return (
                         <Row key={rowIndex} row={rowIndex} />
@@ -322,8 +312,24 @@ const headerRowsCount = 4
         t_container.style.color = t_container.style.color === 'white' ? 'black' : 'white' 
     }
 
-    const test  = (e) => {
-        console.log('Test: ', e)
+    const test1 = () => {
+        console.log('Test: ==============================')
+        props.resetMarkCount();
+        let c = props.getMarkCount()
+        console.log('Count : ', c)
+        
+        
+        console.log('Test: ==============================')
+    }
+
+    const test2 = () => {
+        console.log('Test: ==============================')
+        props.incMarkCount()
+        
+        let c = props.getMarkCount()
+        console.log('Count : ', c)
+        
+        console.log('Test: ==============================')
     }
 
 //** temporary utils section  END*/
@@ -341,7 +347,8 @@ const headerRowsCount = 4
 
             <TableElement tableModel={tableModel} />
         
-            <button onClick={()=>test()} style={{marginRight: '27px'}}>TEST</button>            
+            {/* <button onClick={()=>test1()} style={{marginRight: '27px'}}>GET ONE</button>
+            <button onClick={()=>test2()} style={{marginRight: '27px'}}>GET NEXT</button>             */}
             <button onClick={()=>tableContentHide()}>ON | OFF CONTENT</button>
         
         </div>

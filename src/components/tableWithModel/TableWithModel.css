@@ -1,47 +1,47 @@
 th td {
-    position: relative;
+  position: relative;
 }
 
 
 .table-container{
-  display: block;
-  padding : 20px;
-  width: 90%;
-  border : 1px solid black;
-  background-color: white;
+display: block;
+padding : 20px;
+width: 90%;
+border : 1px solid black;
+background-color: white;
 }
 
 .cell{
-  position: relative;
-  background-color: white;
-  padding: 0px 10px
+position: relative;
+background-color: white;
+padding: 0px 10px
 }
 
 .selected{
-  background: lightskyblue;
+background: lightskyblue;
 }
 
 .marker{
-  border          : 1px solid black;
-  border-radius   : 4px;
-  background-color: greenyellow;
-  
-  width  :40px;
-  height :20px;
-  
-  position : absolute;
-  top : -5px;
-  left: 2px;
+border          : 1px solid black;
+border-radius   : 4px;
+background-color: greenyellow;
+
+width  :40px;
+height :20px;
+
+position : absolute;
+top : -5px;
+left: 2px;
 }
 
 
 
 button{
-  margin:  10px 20px 10px 20px;
-  height: 40px;
+margin:  10px 20px 10px 20px;
+height: 40px;
 }
 
 .hidden {
-  color: white;
+color: white;
 }
 

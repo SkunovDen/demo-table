@@ -7,41 +7,38 @@ import loadNewTable from './data/NewTable'
 
  
 function App() {
+  const [counter, updateCounter] = useState(1)
 
-  const [selectCount, setSelectCount] = useState(1)
+  const getCounter = () => {
+    return counter
+  }
 
-    const incCount = () => {
-      console.log(' INC ')
-      setSelectCount( (prev) => {
-        const upd = (Number(prev)+1)
-        console.log('PREV ', prev,    'UPD: ', upd)
-        return (upd )
-      })
+  const incCounter = () => {
+    console.log('Before INC : ', counter)
+    
+    updateCounter( function(state, props) {
+      return Number(state) + 1 
+    })
+    
+    console.log('After INC : ', counter)
+  }
 
-    }
-
-    const resetCount = () => {
-      console.log('reset')
-      setSelectCount( (prev) => {
-        return (1)
-      })
-
-    }
-
-    const getMarkCount = () => {
-      // incCount();
-
-      return selectCount
-    }
-
+  const resetCounter = () => {
+    updateCounter( (prev) => {
+      return ( 1 )
+    })
+    console.log('After RESET : ', counter)
+  }
 
 
   return (
     <div className="App">
 
       <TableWithModel tableHtml={loadNewTable()} 
-                      getMarkCount={getMarkCount}
-                      resetCount={resetCount} />
+
+                      incMarkCount={incCounter}
+                      resetMarkCount={resetCounter}
+                      getMarkCount={getCounter} />
       
       {/* <div style={{minHeight : '2vh'}}></div>
       <TableWithModel tableHtml={loadOldTable()}/> */}
