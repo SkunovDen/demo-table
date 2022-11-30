@@ -1,4 +1,4 @@
-th td {
+th, td {
   position: relative;
 }
 
@@ -18,8 +18,12 @@ padding: 0px 10px
 }
 
 .selected{
-background: lightskyblue;
+  background: lightskyblue;
 }
+
+.selected2{
+  background: steelblue;
+  }
 
 .marker{
 border          : 1px solid black;

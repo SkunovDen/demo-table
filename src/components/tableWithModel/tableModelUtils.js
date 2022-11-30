@@ -45,10 +45,11 @@ export const getModelFromHtml = (htmlTable) => {
                     textContent : textContent,
                     colSpan  : cell.colSpan,
                     rowSpan  : cell.rowSpan,
-                    colSelected : false,
-                    rowSelected : false,
+
                     visible  : true,
-                    selectCount : ''
+                    selectCount : '',
+
+                    selectLevel: 0
                 }
 
                 initialModel[cellY][cellX] = content
@@ -56,7 +57,7 @@ export const getModelFromHtml = (htmlTable) => {
         )
 
     })
-    
+
     return initialModel
 }
 
