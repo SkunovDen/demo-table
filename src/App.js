@@ -11,7 +11,9 @@ function App() {
   const [ selectedCellsList, updateSelectedCellsList ] = useState([])
 
   const clearSelectedCellsList = (cell) => {
-    updateSelectedCellsList( prev => [])
+    updateSelectedCellsList( prev => {
+      return []
+    })
   }
 
   const addSelection = (cell) => {
@@ -29,7 +31,7 @@ function App() {
   }
 
   const getMarkerNumber = () => {
-    return selectedCellsList.length + 1
+    return selectedCellsList.length
   }
 
 

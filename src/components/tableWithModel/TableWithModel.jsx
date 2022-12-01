@@ -95,7 +95,25 @@ const headerRowsCount = 4
 //** *********************************************** */
 //** Click on TABLE handling section */
 
+    const clearMarkers = () => {
+        const colsCount = tableModel[0].length
+        const rowsCount = tableModel.length
+
+        console.log(' Clear markers: ', colsCount, ' -- ', rowsCount)
+
+        for(let r = 0; r < rowsCount; r++) {
+            for(let c = 0; c < colsCount; c++) {
+                // console.log(' Clear: ', c, ' -- ', r)
+                tableModel[r][c].selectMarker = ''
+            }
+        }
+
+        props.clearSelection()
+    }
+
     const clearSelection = () => {
+        clearMarkers()
+
         let tempSelectionState = []
 
         for(let i = 0; i < colsSelectionState.length; i++) {
@@ -109,6 +127,8 @@ const headerRowsCount = 4
             tempSelectionState.push(false)
         }
         updateRowsSelectionState(tempSelectionState)
+
+
 
     }
 
@@ -212,7 +232,9 @@ const headerRowsCount = 4
     }
 
     const tableClickListener = ({ target }) => {
-
+        
+        
+        
         if ( !isCtrlDown ){ 
             console.log('Ctrl NOT DOWN')
             select(target)
@@ -220,6 +242,21 @@ const headerRowsCount = 4
             console.log('Ctrl DOWN')
             addToSelected(target)
         }
+
+        addMarker(target)
+    }
+
+    const addMarker = (target) => {
+        console.log('ADD MARKER: ', target)
+        const targetCol = Number( target.dataset.col )
+        const targetRow = Number( target.dataset.row )
+
+        const getMarkerNumber = props.getMarkerNumber()
+
+        tableModel[targetRow][targetCol].selectMarker = `${getMarkerNumber}`
+
+        props.addSelection(target)
+
     }
 
 //** Click on TABLE handling section END*/
@@ -298,11 +335,11 @@ const headerRowsCount = 4
         const cellText = cellData.textContent
         
 
-        // const marker = { tableModel[cellRow][cellCol].selectMarker ? 
-        //     (<div className="marker">
-        //         {tableModel[cellRow][cellCol].selectMarker}
-        //     </div>) :
-        //     null
+        const marker = cellData.selectMarker ? 
+            (<div className="marker">
+                {cellData.selectMarker}
+            </div>) :
+            null
 
         const cellElement = 
             <td className={cellClass}
@@ -316,7 +353,7 @@ const headerRowsCount = 4
             >
                 {cellText}  
         
-                {/* {marker} */}
+                {marker}
         
                 
             </td> 
