@@ -96,110 +96,52 @@ const headerRowsCount = 4
 //** Click on TABLE handling section */
 
     const clearSelection = () => {
-        setTableModel( (prev) => {
-            const clearedModel = Array.from( prev )
+        // setTableModel( (prev) => {
+        //     const clearedModel = Array.from( prev )
 
-            clearedModel.forEach( (row, rowIndex) => {
-                row.forEach( (cell, cellIndex) => {
-                    clearedModel[rowIndex][cellIndex].selected = false
-                    clearedModel[rowIndex][cellIndex].selectLevel = 0
-                })
-            } )
+        //     clearedModel.forEach( (row, rowIndex) => {
+        //         row.forEach( (cell, cellIndex) => {
+        //             clearedModel[rowIndex][cellIndex].selected = false
+        //             clearedModel[rowIndex][cellIndex].selectLevel = 0
+        //         })
+        //     } )
 
-            return clearedModel
-        })
-        const colsCount = colsSelectionState.length
+        //     return clearedModel
+        // })
+
+
         let tempSelectionState = []
-        for(let i = 0; i < colsCount; i++) {
+
+        for(let i = 0; i < colsSelectionState.length; i++) {
             tempSelectionState.push(false)
         }
         updateColsSelectionState(tempSelectionState)
 
-        const rowsCount = rowsSelectionState.length
+
         tempSelectionState = []
-        for(let i = 0; i < rowsCount; i++) {
+        for(let i = 0; i < rowsSelectionState.length; i++) {
             tempSelectionState.push(false)
         }
         updateRowsSelectionState(tempSelectionState)
 
     }
 
-    const columnSelectLevelUp = (columnNum) => {
-       setTableModel( (prevModel) => {
-            let updatedModel = Array.from( prevModel )
 
-            updatedModel.forEach( (row, rowIndex) => {   
-                row.forEach( (cell, cellIndex) => {
-                    if (cellIndex === columnNum) {
-                        let updatedLevel = cell.selectLevel + 1
-                        if (updatedLevel > 2) { updatedLevel = 2 }
-                        
-                        cell.selectLevel = updatedLevel
-                    }
-                })
-            });
-
-            return updatedModel
-        }) 
-
-        setColumnSelectedState(columnNum, true)
-    }
-
-    const columnSelectLevelDown = (columnNum) => {
-        setTableModel( (prevModel) => {
-            let updatedModel = Array.from( prevModel )
-
-            updatedModel.forEach( (row, rowIndex) => {   
-                row.forEach( (cell, cellIndex) => {
-                    if (cellIndex === columnNum) {
-                        let updatedLevel = cell.selectLevel - 1
-                        if (updatedLevel < 0) { updatedLevel = 0 }
-                        
-                        cell.selectLevel = updatedLevel
-                    }
-                })
-            });
-
-            return updatedModel
+    const setColumnSelectedState = (columnNum, state) => {
+        updateColsSelectionState( prev => {
+            let updated = Array.from(prev)
+            updated[columnNum] = state
+            return updated
         })
-
-        setColumnSelectedState(columnNum, false)
     }
 
-    const rowSelectLevelUp = (rowNum) => {
-        setTableModel( (prevModel) => {
-            let updatedModel = Array.from( prevModel )
-
-            updatedModel[rowNum].forEach( (element, index) => {
-                let updatedLevel = updatedModel[rowNum][index].selectLevel + 1
-                if (updatedLevel > 2) { updatedLevel = 2 }
-                
-                updatedModel[rowNum][index].selectLevel = updatedLevel
-            });
-
-            return updatedModel
+    const setRowSelectedState = (rowNum, state) => {
+        updateRowsSelectionState( prev => {
+            let updated = Array.from(prev)
+            updated[rowNum] = state
+            return updated
         })
-
-        setRowSelectedState(rowNum, true)
     }
-    
-    const rowSelectLevelDown = (rowNum) => {
-        setTableModel( (prevModel) => {
-            let updatedModel = Array.from( prevModel )
-
-            updatedModel[rowNum].forEach( (element, index) => {
-                let updatedLevel = updatedModel[rowNum][index].selectLevel - 1
-                if (updatedLevel < 0) { updatedLevel = 0 }
-                
-                updatedModel[rowNum][index].selectLevel = updatedLevel
-            });
-
-            return updatedModel
-        })
-
-        setRowSelectedState(rowNum, false)
-    }
-
 
     const setSelectLevelUp2Columns = (clickedTarget) => {
         const startColumn = Number(clickedTarget.dataset.col)
@@ -208,7 +150,7 @@ const headerRowsCount = 4
         const endColumn = startColumn + columnsCount
 
         for (let columnNum = startColumn; columnNum < endColumn; columnNum ++){
-            columnSelectLevelUp( columnNum )
+            setColumnSelectedState(columnNum, true)
         }   
     }
 
@@ -219,10 +161,9 @@ const headerRowsCount = 4
         const endColumn = startColumn + columnsCount
 
         for (let columnNum = startColumn; columnNum < endColumn; columnNum ++){
-            columnSelectLevelDown( columnNum )
+            setColumnSelectedState(columnNum, false)
         }
     }
-
 
 
     const setSelectLevelUp2Rows = (clickedTarget) => {
@@ -232,7 +173,7 @@ const headerRowsCount = 4
         const endRow = Number(startRow) + Number(rowsCount)
 
         for (let rowNum = startRow; rowNum < endRow; rowNum ++){
-            rowSelectLevelUp( rowNum )
+            setRowSelectedState(rowNum, true)
         } 
     }
 
@@ -243,34 +184,13 @@ const headerRowsCount = 4
         const endRow = Number(startRow) + Number(rowsCount)
 
         for (let rowNum = startRow; rowNum < endRow; rowNum ++){
-            rowSelectLevelDown( rowNum )
+            setRowSelectedState(rowNum, false)
         } 
     }
 
     ////////////////////////////
 
 
-    const setColumnSelectedState = (columnNum, state) => {
-        // const columnNum = target.dataset.col
-
-        console.log('SELECT: ', columnNum)
-        updateColsSelectionState( prev => {
-            let updated = prev
-            updated[columnNum] = state
-            return updated
-        })
-    }
-
-    const setRowSelectedState = (columnNum, state) => {
-        // const columnNum = target.dataset.col
-
-        console.log('SELECT: ', columnNum)
-        updateRowsSelectionState( prev => {
-            let updated = prev
-            updated[columnNum] = state
-            return updated
-        })
-    }
 
     
     const select = (target) => {
@@ -279,19 +199,14 @@ const headerRowsCount = 4
         const isHeader = (target.dataset.row < headerRowsCount )
         if ( isHeader ){
             setSelectLevelUp2Columns(target)
-            
         } else {
             setSelectLevelUp2Rows(target)
         }
     }
 
-
-
     const addToSelected = (target) => {
         const targetCol = target.dataset.col
         const targetRow = target.dataset.row
-
-        // const currentSelectLevel =  tableModel[targetRow][targetCol].selectLevel
 
         const isTargetColSelect = colsSelectionState[targetCol]
         const isTargetRowSelect = rowsSelectionState[targetRow]
@@ -313,14 +228,7 @@ const headerRowsCount = 4
         }
     }
 
-    const pureSelectionListener = ({ target }) => {
-        // console.log('Click')
-        ///temporary clear selection / will be ignore click  
-        if( (target.dataset.col === '0') && (target.dataset.row === '0')){
-            clearSelection()
-
-            return
-        }
+    const tableClickListener = ({ target }) => {
 
         if ( !isCtrlDown ){ 
             console.log('Ctrl NOT DOWN')
@@ -366,7 +274,7 @@ const headerRowsCount = 4
     }
 
     const getCellClass = (cell) => {
-        const cellLevel = checkCellSelectLevel(cell) //cell.selectLevel
+        const cellLevel = checkCellSelectLevel(cell)
 
         if ((cellLevel > 0) && (cell.Y < headerRowsCount)){
             return 'cell selected2'
@@ -374,7 +282,6 @@ const headerRowsCount = 4
 
         let className;
         switch (cellLevel) {
-
             case 1: {
                 className = 'cell selected' 
                 break;
@@ -410,7 +317,7 @@ const headerRowsCount = 4
         const cellElement = 
             <td className={cellClass}
                     
-                onClick = {(e) => pureSelectionListener(e) }
+                onClick = {(e) => tableClickListener(e) }
 
                 data-col={cellCol}
                 data-row={cellRow}
@@ -467,26 +374,7 @@ const headerRowsCount = 4
         t_container.style.color = t_container.style.color === 'white' ? 'black' : 'white' 
     }
 
-    const test1 = () => {
-        console.log('Test: ==============================')
-        console.log('=== AFTER CLICK ===')
-        console.log('COLS STATE: ', colsSelectionState)
-        console.log('ROWS STATE: ', rowsSelectionState)
-        console.log(' ')
-        
-        
-        console.log('Test: ==============================')
-    }
-
-    // const test2 = () => {
-    //     console.log('Test: ==============================')
-    //     props.incMarkCount()
-        
-    //     let c = props.getMarkCount()
-    //     console.log('Count : ', c)
-        
-    //     console.log('Test: ==============================')
-    // }
+   
 
 //** temporary utils section  END*/
 //** *********************************************** */
@@ -501,12 +389,12 @@ const headerRowsCount = 4
              onKeyUp={(e)=>keyReleaseHandler(e)}
             > 
 
-            <TableElement tableModel={tableModel} clickListener={pureSelectionListener} />
+            <TableElement tableModel={tableModel} />
         
-            <button onClick={()=>test1()} style={{marginRight: '27px'}}>GET ONE</button>
+            {/* <button onClick={()=>test1()} style={{marginRight: '27px'}}>GET ONE</button> */}
             {/* <button onClick={()=>test2()} style={{marginRight: '27px'}}>GET NEXT</button>             */}
             <button onClick={()=>tableContentHide()}>ON | OFF CONTENT</button>
-        
+            <button onClick={()=>clearSelection()}>CLEAR SELECTION</button>
         </div>
     )
 }
