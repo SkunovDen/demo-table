@@ -328,27 +328,33 @@ const headerRowsCount = 4
 //** *********************************************** */
 //** Generate TABLE ELEMENT HTML section  */
 
-    // const checkCellSelectLevel = (cell) => {
-    //     const startCol = cell.X
-    //     const endCol =  startCol + cell.colSpan
-    //     const startRow = cell.Y
-    //     const endRow = startRow + cell.rowSpan
+    const checkCellSelectLevel = (cell) => {
+        const startCol = cell.X
+        const endCol =  startCol + cell.colSpan
+        const startRow = cell.Y
+        const endRow = startRow + cell.rowSpan
 
-    //     let result = 0
+        let result = 0
         
-    //     for (let col = startCol; col < endCol; col++) {
-    //         for (let row = startRow; row < endRow; row++) { 
-    //             if (tableModel[row][col].selectLevel > 0) {
-    //                 result = 1
-    //             }
-    //         }
-    //     }
+        for (let col = startCol; col < endCol; col++) {
+            for (let row = startRow; row < endRow; row++) { 
+                const scanLevel = tableModel[row][col].selectLevel
+                // if (tableModel[row][col].selectLevel > 0) {
+                if (scanLevel > result) {
+                    result = scanLevel 
+                }
+            }
+        }
 
-    //     return result 
-    // }
+        return result 
+    }
 
     const getCellClass = (cell) => {
-        const cellLevel = cell.selectLevel
+        const cellLevel = checkCellSelectLevel(cell) //cell.selectLevel
+
+        if ((cellLevel > 0) && (cell.Y < headerRowsCount)){
+            return 'cell selected2'
+        }
         let className;
         switch (cellLevel) {
             case 0: {
