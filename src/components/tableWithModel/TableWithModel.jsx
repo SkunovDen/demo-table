@@ -1,13 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
 import './TableWithModel.css'
-import { getModelFromHtml, 
-    // isMergedSelected 
-} from "./tableModelUtils";
+import { getModelFromHtml } from "./tableModelUtils";
+
+
 
 
 const TableWithModel = (props) => {
     const [tableModel, setTableModel] = useState( [] )
-    const [isCtrlDown, setIsCtrlDown] = useState(false)
+    
+
+    const [colsSelectionState, updateColsSelectionState] = useState([])
+    const [rowsSelectionState, updateRowsSelectionState] = useState([])
+    
 
 
 ///  REMOVE HARD_CODE MAGIC NUMBER   !!!!!!!!!!!!!!!!!!
@@ -33,8 +37,24 @@ const headerRowsCount = 4
                 const tableModel = getModelFromHtml(table) 
 
     // get header rows coun here ?
-                console.log('EFFECT:  ROWS', tableModel.length, '  COLS: ', tableModel[0].length)
-                return  tableModel } )
+                const colsCount = tableModel[0].length
+                const rowsCount = tableModel.length
+                console.log('EFFECT:  COLS', colsCount, '  ROWS: ', rowsCount)
+
+                let tempSelectionState = []
+                for(let i = 0; i < colsCount; i++) {
+                    tempSelectionState.push(false)
+                }
+                updateColsSelectionState(tempSelectionState)
+
+                tempSelectionState = []
+                for(let i = 0; i < rowsCount; i++) {
+                    tempSelectionState.push(false)
+                }
+                updateRowsSelectionState(tempSelectionState)
+
+                return  tableModel 
+            })
         }
         createModel()
         
@@ -46,6 +66,7 @@ const headerRowsCount = 4
 
 //** *********************************************** */
 //** Ctrl key press handling section */
+    const [isCtrlDown, setIsCtrlDown] = useState(false)
 
     const ref = useRef(null);
 
@@ -87,11 +108,24 @@ const headerRowsCount = 4
 
             return clearedModel
         })
+        const colsCount = colsSelectionState.length
+        let tempSelectionState = []
+        for(let i = 0; i < colsCount; i++) {
+            tempSelectionState.push(false)
+        }
+        updateColsSelectionState(tempSelectionState)
+
+        const rowsCount = rowsSelectionState.length
+        tempSelectionState = []
+        for(let i = 0; i < rowsCount; i++) {
+            tempSelectionState.push(false)
+        }
+        updateRowsSelectionState(tempSelectionState)
 
     }
 
     const columnSelectLevelUp = (columnNum) => {
-        setTableModel( (prevModel) => {
+       setTableModel( (prevModel) => {
             let updatedModel = Array.from( prevModel )
 
             updatedModel.forEach( (row, rowIndex) => {   
@@ -106,7 +140,9 @@ const headerRowsCount = 4
             });
 
             return updatedModel
-        })
+        }) 
+
+        setColumnSelectedState(columnNum, true)
     }
 
     const columnSelectLevelDown = (columnNum) => {
@@ -126,6 +162,8 @@ const headerRowsCount = 4
 
             return updatedModel
         })
+
+        setColumnSelectedState(columnNum, false)
     }
 
     const rowSelectLevelUp = (rowNum) => {
@@ -141,6 +179,8 @@ const headerRowsCount = 4
 
             return updatedModel
         })
+
+        setRowSelectedState(rowNum, true)
     }
     
     const rowSelectLevelDown = (rowNum) => {
@@ -156,6 +196,8 @@ const headerRowsCount = 4
 
             return updatedModel
         })
+
+        setRowSelectedState(rowNum, false)
     }
 
 
@@ -207,61 +249,28 @@ const headerRowsCount = 4
 
     ////////////////////////////
 
-    // const setColumnSelectedState = (columnNum, selectedState) => {
 
-    //     setTableModel( (prevModel) => {
-    //         let updatedModel = Array.from( prevModel )
+    const setColumnSelectedState = (columnNum, state) => {
+        // const columnNum = target.dataset.col
 
-    //         updatedModel.forEach( (row, rowIndex) => {   
-    //             row.forEach( (cell, cellIndex) => {
-    //                 if (cellIndex === columnNum) {
-    //                     // cell.selected = selectedState
-    //                     cell.selectLevel = selectedState ? 1 : 0
-    //                 }
-    //             })
-    //         });
+        console.log('SELECT: ', columnNum)
+        updateColsSelectionState( prev => {
+            let updated = prev
+            updated[columnNum] = state
+            return updated
+        })
+    }
 
-    //         return updatedModel
-    //     })
-    // }
+    const setRowSelectedState = (columnNum, state) => {
+        // const columnNum = target.dataset.col
 
-    // const setColumnsSelectedState = (clickedTarget, selectedState) => {
-
-    //     const startColumn = Number(clickedTarget.dataset.col)
-    //     const columnsCount = Number(clickedTarget.colSpan)
-
-    //     const endColumn = startColumn + columnsCount
-
-    //     for (let columnNum = startColumn; columnNum < endColumn; columnNum ++){
-    //         setColumnSelectedState( columnNum, selectedState )
-    //     }   
-    // }
-
-    // const setRowSelectedState = (rowNum, selectedState) => {
-        
-    //     setTableModel( (prevModel) => {
-    //         let updatedModel = Array.from( prevModel )
-
-    //         updatedModel[rowNum].forEach( (element, index) => {
-    //             updatedModel[rowNum][index].selected = selectedState
-    //             updatedModel[rowNum][index].selectLevel = selectedState ? 1 : 0
-    //         });
-
-    //         return updatedModel
-    //     })
-    // }
-
-    // const setRowsSelectedState = (clickedTarget, selectedState) => {
-    //     const startRow = Number( clickedTarget.dataset.row)
-    //     const rowsCount = Number(clickedTarget.rowSpan)
-
-    //     const endRow = Number(startRow) + Number(rowsCount)
-
-    //     for (let rowNum = startRow; rowNum < endRow; rowNum ++){
-    //         setRowSelectedState( rowNum, selectedState )
-    //     }   
-    // }
-
+        console.log('SELECT: ', columnNum)
+        updateRowsSelectionState( prev => {
+            let updated = prev
+            updated[columnNum] = state
+            return updated
+        })
+    }
 
     
     const select = (target) => {
@@ -270,6 +279,7 @@ const headerRowsCount = 4
         const isHeader = (target.dataset.row < headerRowsCount )
         if ( isHeader ){
             setSelectLevelUp2Columns(target)
+            
         } else {
             setSelectLevelUp2Rows(target)
         }
@@ -281,18 +291,21 @@ const headerRowsCount = 4
         const targetCol = target.dataset.col
         const targetRow = target.dataset.row
 
-        const currentSelectLevel =  tableModel[targetRow][targetCol].selectLevel
+        // const currentSelectLevel =  tableModel[targetRow][targetCol].selectLevel
+
+        const isTargetColSelect = colsSelectionState[targetCol]
+        const isTargetRowSelect = rowsSelectionState[targetRow]
 
         const isHeader = (target.dataset.row < headerRowsCount )
 
         if ( isHeader ){
-            if (currentSelectLevel > 0) {
+            if (isTargetColSelect) {
                 setSelectLevelDown2Columns(target)
             } else {
                 setSelectLevelUp2Columns(target)
             }
         } else {
-            if (currentSelectLevel > 0) {
+            if (isTargetRowSelect) {
                 setSelectLevelDown2Rows(target)
             } else {
                 setSelectLevelUp2Rows(target)
@@ -334,17 +347,20 @@ const headerRowsCount = 4
         const startRow = cell.Y
         const endRow = startRow + cell.rowSpan
 
-        let result = 0
-        
-        for (let col = startCol; col < endCol; col++) {
-            for (let row = startRow; row < endRow; row++) { 
-                const scanLevel = tableModel[row][col].selectLevel
-                // if (tableModel[row][col].selectLevel > 0) {
-                if (scanLevel > result) {
-                    result = scanLevel 
-                }
-            }
+        // is one of cols selected?
+        let isColSelected = false
+        for (let col = startCol; col < endCol; col++) {             
+            isColSelected ||=  colsSelectionState[col]
         }
+
+        // is one of rows selected?
+        let isRowSelected = false
+        for (let row = startRow; row < endRow; row++) {             
+            isRowSelected ||=  rowsSelectionState[row]
+        }
+
+        let result = isColSelected ? 1 : 0
+        result    += isRowSelected ? 1 : 0
 
         return result 
     }
@@ -355,12 +371,10 @@ const headerRowsCount = 4
         if ((cellLevel > 0) && (cell.Y < headerRowsCount)){
             return 'cell selected2'
         }
+
         let className;
         switch (cellLevel) {
-            case 0: {
-                className = 'cell';
-                break;
-            }
+
             case 1: {
                 className = 'cell selected' 
                 break;
@@ -428,7 +442,7 @@ const headerRowsCount = 4
         const tableModel = props.tableModel
         
         return(
-            <table border={1} cellpadding="0" cellspacing="0">
+            <table border={1} cellPadding="0" cellSpacing="0">
                 { tableModel.map( (_r, rowIndex) => {
                     return (
                         <Row key={rowIndex} row={rowIndex} />
@@ -453,15 +467,16 @@ const headerRowsCount = 4
         t_container.style.color = t_container.style.color === 'white' ? 'black' : 'white' 
     }
 
-    // const test1 = () => {
-    //     console.log('Test: ==============================')
-    //     props.resetMarkCount();
-    //     let c = props.getMarkCount()
-    //     console.log('Count : ', c)
+    const test1 = () => {
+        console.log('Test: ==============================')
+        console.log('=== AFTER CLICK ===')
+        console.log('COLS STATE: ', colsSelectionState)
+        console.log('ROWS STATE: ', rowsSelectionState)
+        console.log(' ')
         
         
-    //     console.log('Test: ==============================')
-    // }
+        console.log('Test: ==============================')
+    }
 
     // const test2 = () => {
     //     console.log('Test: ==============================')
@@ -486,10 +501,10 @@ const headerRowsCount = 4
              onKeyUp={(e)=>keyReleaseHandler(e)}
             > 
 
-            <TableElement tableModel={tableModel} />
+            <TableElement tableModel={tableModel} clickListener={pureSelectionListener} />
         
-            {/* <button onClick={()=>test1()} style={{marginRight: '27px'}}>GET ONE</button>
-            <button onClick={()=>test2()} style={{marginRight: '27px'}}>GET NEXT</button>             */}
+            <button onClick={()=>test1()} style={{marginRight: '27px'}}>GET ONE</button>
+            {/* <button onClick={()=>test2()} style={{marginRight: '27px'}}>GET NEXT</button>             */}
             <button onClick={()=>tableContentHide()}>ON | OFF CONTENT</button>
         
         </div>
