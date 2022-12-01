@@ -47,7 +47,7 @@ export const getModelFromHtml = (htmlTable) => {
                     rowSpan  : cell.rowSpan,
 
                     visible  : true,
-                    selectCount : '',
+                    selectMarker : '',
 
                     selectLevel: 0
                 }

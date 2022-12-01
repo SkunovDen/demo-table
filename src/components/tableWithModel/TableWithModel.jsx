@@ -36,7 +36,7 @@ const headerRowsCount = 4
             setTableModel( prev => {
                 const tableModel = getModelFromHtml(table) 
 
-    // get header rows coun here ?
+    // get header rows count here ???
                 const colsCount = tableModel[0].length
                 const rowsCount = tableModel.length
                 console.log('EFFECT:  COLS', colsCount, '  ROWS: ', rowsCount)
@@ -75,13 +75,13 @@ const headerRowsCount = 4
     }, []);
 
     const keyDownHandler = (e) => {
-        if (( e.key === 'Control') || (window.navigator.platform.startsWith("Mac") && e.metaKey))  {
+        if (( e.ctrlKey ) || (window.navigator.platform.startsWith("Mac") && e.metaKey))  {
             setIsCtrlDown( (prev) => { return true })
         }
     }
 
     const keyReleaseHandler = (e) => {
-        if (( e.key === 'Control') || (window.navigator.platform.startsWith("Mac") && e.metaKey)){
+        if (( e.ctrlKey ) || (window.navigator.platform.startsWith("Mac") && e.metaKey)){
             setIsCtrlDown( (prev) => { return false })
         }
     }
@@ -96,20 +96,6 @@ const headerRowsCount = 4
 //** Click on TABLE handling section */
 
     const clearSelection = () => {
-        // setTableModel( (prev) => {
-        //     const clearedModel = Array.from( prev )
-
-        //     clearedModel.forEach( (row, rowIndex) => {
-        //         row.forEach( (cell, cellIndex) => {
-        //             clearedModel[rowIndex][cellIndex].selected = false
-        //             clearedModel[rowIndex][cellIndex].selectLevel = 0
-        //         })
-        //     } )
-
-        //     return clearedModel
-        // })
-
-
         let tempSelectionState = []
 
         for(let i = 0; i < colsSelectionState.length; i++) {
@@ -125,7 +111,6 @@ const headerRowsCount = 4
         updateRowsSelectionState(tempSelectionState)
 
     }
-
 
     const setColumnSelectedState = (columnNum, state) => {
         updateColsSelectionState( prev => {
@@ -191,8 +176,6 @@ const headerRowsCount = 4
     ////////////////////////////
 
 
-
-    
     const select = (target) => {
         clearSelection();
         
@@ -301,19 +284,26 @@ const headerRowsCount = 4
     const Cell = (props) => {
         const cellCol = props.col
         const cellRow = props.row
+        const cellData = tableModel[cellRow][cellCol]
 
-        if (!tableModel[cellRow][cellCol].visible){
+        if (!cellData.visible){
             return null
         }
 
-        const cellClass = getCellClass( tableModel[cellRow][cellCol] )
+        const cellClass = getCellClass( cellData )
 
+        const cellColSpan = cellData.colSpan
+        const cellRowSpan = cellData.rowSpan
+        
+        const cellText = cellData.textContent
+        
 
-        const cellColSpan = tableModel[props.row][props.col].colSpan
-        const cellRowSpan = tableModel[props.row][props.col].rowSpan
-        
-        const cellText = tableModel[cellRow][cellCol].textContent
-        
+        // const marker = { tableModel[cellRow][cellCol].selectMarker ? 
+        //     (<div className="marker">
+        //         {tableModel[cellRow][cellCol].selectMarker}
+        //     </div>) :
+        //     null
+
         const cellElement = 
             <td className={cellClass}
                     
@@ -374,6 +364,24 @@ const headerRowsCount = 4
         t_container.style.color = t_container.style.color === 'white' ? 'black' : 'white' 
     }
 
+    const test1 = () => {
+        const getMarkerNumber = props.getMarkerNumber()
+
+        console.log('getMarkerNumber ',  getMarkerNumber)
+    }
+
+    const test2 = () => {
+        props.addSelection('temp')
+
+
+    }
+
+    const test3 = () => {
+        const getMarkerNumber = props.clearSelection()
+    }
+
+
+
    
 
 //** temporary utils section  END*/
@@ -391,8 +399,10 @@ const headerRowsCount = 4
 
             <TableElement tableModel={tableModel} />
         
-            {/* <button onClick={()=>test1()} style={{marginRight: '27px'}}>GET ONE</button> */}
-            {/* <button onClick={()=>test2()} style={{marginRight: '27px'}}>GET NEXT</button>             */}
+            <button onClick={()=>test1()} style={{marginRight: '27px'}}>GET ONE</button> 
+            <button onClick={()=>test2()} style={{marginRight: '27px'}}>GET NEXT</button>
+            <button onClick={()=>test3()} style={{marginRight: '27px'}}>CLEAR MARKER</button>             
+            
             <button onClick={()=>tableContentHide()}>ON | OFF CONTENT</button>
             <button onClick={()=>clearSelection()}>CLEAR SELECTION</button>
         </div>
