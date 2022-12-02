@@ -39,7 +39,7 @@ const headerRowsCount = 4
     // get header rows count here ???
                 const colsCount = tableModel[0].length
                 const rowsCount = tableModel.length
-                console.log('EFFECT:  COLS', colsCount, '  ROWS: ', rowsCount)
+                // console.log('EFFECT:  COLS', colsCount, '  ROWS: ', rowsCount)
 
                 let tempSelectionState = []
                 for(let i = 0; i < colsCount; i++) {
@@ -76,18 +76,18 @@ const headerRowsCount = 4
 
     const keyDownHandler = (e) => {
         console.log(' ')
-        console.log('KEY PRESS: ', e.key, '  is ctrlKey? ', e.ctrlKey)
+        // console.log('KEY PRESS: ', e.key, '  is ctrlKey? ', e.ctrlKey)
         if (( e.key==='Control' ) || (window.navigator.platform.startsWith("Mac") && e.metaKey))  {
-            console.log('CTRL DOWN')
+            // console.log('CTRL DOWN')
             setIsCtrlDown( (prev) => { return true })
         }
     }
 
     const keyReleaseHandler = (e) => {
-        console.log('KEY RELEASE: ',e.key, '  is ctrlKey? ', e.ctrlKey)
+        // console.log('KEY RELEASE: ',e.key, '  is ctrlKey? ', e.ctrlKey)
         // !!! e.ctrlKey NOT WORKED ON RELEASE KEY 
         if (( e.key==='Control' ) || (window.navigator.platform.startsWith("Mac") && e.metaKey)){
-            console.log('CTRL RELEASE')
+            // console.log('CTRL RELEASE')
             setIsCtrlDown( (prev) => { return false })
         }
     }
@@ -161,6 +161,9 @@ const headerRowsCount = 4
         for (let columnNum = startColumn; columnNum < endColumn; columnNum ++){
             setColumnSelectedState(columnNum, true)
         }   
+
+        const markerNumber = props.getNext(clickedTarget)
+        addMarker(clickedTarget, markerNumber)
     }
 
     const setSelectLevelDown2Columns = (clickedTarget) => {
@@ -184,6 +187,9 @@ const headerRowsCount = 4
         for (let rowNum = startRow; rowNum < endRow; rowNum ++){
             setRowSelectedState(rowNum, true)
         } 
+
+        const markerNumber = props.getNext(clickedTarget)
+        addMarker(clickedTarget, markerNumber)
     }
 
     const setSelectLevelDown2Rows = (clickedTarget) => {
@@ -203,8 +209,6 @@ const headerRowsCount = 4
         const targetCol = target.dataset.col
         const targetRow = target.dataset.row 
 
-        // console.log('Add marker to: ', target, ' marker NUM : ', marker)
-
         tableModel[targetRow][targetCol].selectMarker = `${marker}`
     }
 
@@ -218,8 +222,6 @@ const headerRowsCount = 4
             setSelectLevelUp2Rows(target)
         }
 
-        const markerNumber = props.getFirst(target)
-        addMarker(target, markerNumber)
     }
 
     const addToSelected = (target) => {
@@ -245,8 +247,6 @@ const headerRowsCount = 4
             }
         }
 
-        const markerNumber = props.getNext(target)
-        addMarker(target, markerNumber)
     }
 
     const tableClickListener = ({ target }) => {
@@ -336,7 +336,7 @@ const headerRowsCount = 4
         const cellText = cellData.textContent
         
 
-        const marker = cellData.selectMarker ? 
+        const marker = (cellData.selectMarker && (cellClass !=='cell')) ? 
             (<div className="marker">
                 {cellData.selectMarker}
             </div>) :
