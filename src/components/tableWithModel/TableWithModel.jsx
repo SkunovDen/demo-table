@@ -75,13 +75,18 @@ const headerRowsCount = 4
     }, []);
 
     const keyDownHandler = (e) => {
-        if (( e.ctrlKey ) || (window.navigator.platform.startsWith("Mac") && e.metaKey))  {
+        console.log(' ')
+        console.log('KEY PRESS: ', e.key, '  is ctrlKey? ', e.ctrlKey)
+        if (( e.key==='Control' ) || (window.navigator.platform.startsWith("Mac") && e.metaKey))  {
+            console.log('CTRL DOWN')
             setIsCtrlDown( (prev) => { return true })
         }
     }
 
     const keyReleaseHandler = (e) => {
-        if (( e.ctrlKey ) || (window.navigator.platform.startsWith("Mac") && e.metaKey)){
+        console.log('KEY RELEASE: ',e.key, '  is ctrlKey? ', e.ctrlKey)
+        if (( e.key==='Control' ) || (window.navigator.platform.startsWith("Mac") && e.metaKey)){
+            console.log('CTRL RELEASE')
             setIsCtrlDown( (prev) => { return false })
         }
     }
@@ -108,7 +113,7 @@ const headerRowsCount = 4
             }
         }
 
-        props.clearSelection()
+        // props.clearSelection()
     }
 
     const clearSelection = () => {
@@ -195,6 +200,14 @@ const headerRowsCount = 4
 
     ////////////////////////////
 
+    const addMarker = (target, marker) => {
+        const targetCol = target.dataset.col
+        const targetRow = target.dataset.row 
+
+        console.log('Add marker to: ', target, ' marker NUM : ', marker)
+
+        tableModel[targetRow][targetCol].selectMarker = `${marker}`
+    }
 
     const select = (target) => {
         clearSelection();
@@ -205,6 +218,9 @@ const headerRowsCount = 4
         } else {
             setSelectLevelUp2Rows(target)
         }
+
+        const markerNumber = props.getFirst(target)
+        addMarker(target, markerNumber)
     }
 
     const addToSelected = (target) => {
@@ -229,11 +245,12 @@ const headerRowsCount = 4
                 setSelectLevelUp2Rows(target)
             }
         }
+
+        const markerNumber = props.getNext(target)
+        addMarker(target, markerNumber)
     }
 
     const tableClickListener = ({ target }) => {
-        
-        
         
         if ( !isCtrlDown ){ 
             console.log('Ctrl NOT DOWN')
@@ -242,21 +259,6 @@ const headerRowsCount = 4
             console.log('Ctrl DOWN')
             addToSelected(target)
         }
-
-        addMarker(target)
-    }
-
-    const addMarker = (target) => {
-        console.log('ADD MARKER: ', target)
-        const targetCol = Number( target.dataset.col )
-        const targetRow = Number( target.dataset.row )
-
-        const getMarkerNumber = props.getMarkerNumber()
-
-        tableModel[targetRow][targetCol].selectMarker = `${getMarkerNumber}`
-
-        props.addSelection(target)
-
     }
 
 //** Click on TABLE handling section END*/

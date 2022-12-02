@@ -8,42 +8,58 @@ import loadNewTable from './data/NewTable'
  
 function App() {
  
-  const [ selectedCellsList, updateSelectedCellsList ] = useState([])
+//** markers state
+  const [selected, setSelected] = useState([])
 
-  const clearSelectedCellsList = (cell) => {
-    updateSelectedCellsList( prev => {
+  const getFirst = (cell) => {
+
+    console.log('GET FIRST')
+    setSelected ( prev => {
+      return [cell]
+    })
+    
+    return 1
+  }
+
+  const getNext = (cell) => {
+    console.log('GET NEXT')
+
+    const l = selected.length + 1
+
+    setSelected( (prev) => {    
+      let updated = Array.from (prev)
+      updated.push ( cell )
+      
+      return updated
+    })
+
+    return l
+  }
+
+  const print = () => {
+    console.log(' ')
+    console.log(selected.join('-'))
+  }
+
+  const clear = () => {
+    console.log('CLEAR')
+    setSelected ( prev => {
       return []
     })
   }
-
-  const addSelection = (cell) => {
-    console.log('ADD selection : ', cell)
-
-    const newData = {
-      cell : 'cell'
-    }
-
-    updateSelectedCellsList( prev => {
-      let updated = Array.from(prev)
-      updated.push ( newData )
-      return updated
-    })
-  }
-
-  const getMarkerNumber = () => {
-    return selectedCellsList.length
-  }
+//** markers state END
 
 
   return (
     <div className="App">
 
       <TableWithModel tableHtml={loadNewTable()} 
+                getFirst={getFirst}
+                getNext={getNext}
+                print={print}
+                clear={clear}
 
-                      getMarkerNumber={getMarkerNumber}
-                      addSelection={addSelection}
-                      clearSelection={clearSelectedCellsList}
-                      />
+      />
       
       {/* <div style={{minHeight : '2vh'}}></div>
       <TableWithModel tableHtml={loadOldTable()}/> */}
