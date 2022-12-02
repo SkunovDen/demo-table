@@ -36,7 +36,7 @@ const headerRowsCount = 4
             setTableModel( prev => {
                 const tableModel = getModelFromHtml(table) 
 
-    // get header rows coun here ?
+    // get header rows count here ???
                 const colsCount = tableModel[0].length
                 const rowsCount = tableModel.length
                 console.log('EFFECT:  COLS', colsCount, '  ROWS: ', rowsCount)
@@ -75,13 +75,19 @@ const headerRowsCount = 4
     }, []);
 
     const keyDownHandler = (e) => {
-        if (( e.key === 'Control') || (window.navigator.platform.startsWith("Mac") && e.metaKey))  {
+        console.log(' ')
+        console.log('KEY PRESS: ', e.key, '  is ctrlKey? ', e.ctrlKey)
+        if (( e.key==='Control' ) || (window.navigator.platform.startsWith("Mac") && e.metaKey))  {
+            console.log('CTRL DOWN')
             setIsCtrlDown( (prev) => { return true })
         }
     }
 
     const keyReleaseHandler = (e) => {
-        if (( e.key === 'Control') || (window.navigator.platform.startsWith("Mac") && e.metaKey)){
+        console.log('KEY RELEASE: ',e.key, '  is ctrlKey? ', e.ctrlKey)
+        // !!! e.ctrlKey NOT WORKED ON RELEASE KEY 
+        if (( e.key==='Control' ) || (window.navigator.platform.startsWith("Mac") && e.metaKey)){
+            console.log('CTRL RELEASE')
             setIsCtrlDown( (prev) => { return false })
         }
     }
@@ -95,20 +101,22 @@ const headerRowsCount = 4
 //** *********************************************** */
 //** Click on TABLE handling section */
 
+    const clearMarkers = () => {
+        const colsCount = tableModel[0].length
+        const rowsCount = tableModel.length
+
+        // clear markers:  colsCount , rowsCount
+
+        for(let r = 0; r < rowsCount; r++) {
+            for(let c = 0; c < colsCount; c++) {
+                // clear cell (c, r) marker
+                tableModel[r][c].selectMarker = ''
+            }
+        }
+    }
+
     const clearSelection = () => {
-        // setTableModel( (prev) => {
-        //     const clearedModel = Array.from( prev )
-
-        //     clearedModel.forEach( (row, rowIndex) => {
-        //         row.forEach( (cell, cellIndex) => {
-        //             clearedModel[rowIndex][cellIndex].selected = false
-        //             clearedModel[rowIndex][cellIndex].selectLevel = 0
-        //         })
-        //     } )
-
-        //     return clearedModel
-        // })
-
+        clearMarkers()
 
         let tempSelectionState = []
 
@@ -124,8 +132,9 @@ const headerRowsCount = 4
         }
         updateRowsSelectionState(tempSelectionState)
 
-    }
 
+
+    }
 
     const setColumnSelectedState = (columnNum, state) => {
         updateColsSelectionState( prev => {
@@ -190,9 +199,15 @@ const headerRowsCount = 4
 
     ////////////////////////////
 
+    const addMarker = (target, marker) => {
+        const targetCol = target.dataset.col
+        const targetRow = target.dataset.row 
 
+        // console.log('Add marker to: ', target, ' marker NUM : ', marker)
 
-    
+        tableModel[targetRow][targetCol].selectMarker = `${marker}`
+    }
+
     const select = (target) => {
         clearSelection();
         
@@ -202,6 +217,9 @@ const headerRowsCount = 4
         } else {
             setSelectLevelUp2Rows(target)
         }
+
+        const markerNumber = props.getFirst(target)
+        addMarker(target, markerNumber)
     }
 
     const addToSelected = (target) => {
@@ -226,15 +244,18 @@ const headerRowsCount = 4
                 setSelectLevelUp2Rows(target)
             }
         }
+
+        const markerNumber = props.getNext(target)
+        addMarker(target, markerNumber)
     }
 
     const tableClickListener = ({ target }) => {
-
+        
         if ( !isCtrlDown ){ 
-            console.log('Ctrl NOT DOWN')
+            // console.log('Ctrl NOT DOWN')
             select(target)
         } else {
-            console.log('Ctrl DOWN')
+            // console.log('Ctrl DOWN')
             addToSelected(target)
         }
     }
@@ -301,19 +322,26 @@ const headerRowsCount = 4
     const Cell = (props) => {
         const cellCol = props.col
         const cellRow = props.row
+        const cellData = tableModel[cellRow][cellCol]
 
-        if (!tableModel[cellRow][cellCol].visible){
+        if (!cellData.visible){
             return null
         }
 
-        const cellClass = getCellClass( tableModel[cellRow][cellCol] )
+        const cellClass = getCellClass( cellData )
 
+        const cellColSpan = cellData.colSpan
+        const cellRowSpan = cellData.rowSpan
+        
+        const cellText = cellData.textContent
+        
 
-        const cellColSpan = tableModel[props.row][props.col].colSpan
-        const cellRowSpan = tableModel[props.row][props.col].rowSpan
-        
-        const cellText = tableModel[cellRow][cellCol].textContent
-        
+        const marker = cellData.selectMarker ? 
+            (<div className="marker">
+                {cellData.selectMarker}
+            </div>) :
+            null
+
         const cellElement = 
             <td className={cellClass}
                     
@@ -326,7 +354,7 @@ const headerRowsCount = 4
             >
                 {cellText}  
         
-                {/* {marker} */}
+                {marker}
         
                 
             </td> 
@@ -374,6 +402,24 @@ const headerRowsCount = 4
         t_container.style.color = t_container.style.color === 'white' ? 'black' : 'white' 
     }
 
+    // const test1 = () => {
+    //     const getMarkerNumber = props.getMarkerNumber()
+
+    //     console.log('getMarkerNumber ',  getMarkerNumber)
+    // }
+
+    // const test2 = () => {
+    //     props.addSelection('temp')
+
+
+    // }
+
+    // const test3 = () => {
+    //     const getMarkerNumber = props.clearSelection()
+    // }
+
+
+
    
 
 //** temporary utils section  END*/
@@ -391,8 +437,10 @@ const headerRowsCount = 4
 
             <TableElement tableModel={tableModel} />
         
-            {/* <button onClick={()=>test1()} style={{marginRight: '27px'}}>GET ONE</button> */}
-            {/* <button onClick={()=>test2()} style={{marginRight: '27px'}}>GET NEXT</button>             */}
+            {/* <button onClick={()=>test1()} style={{marginRight: '27px'}}>GET ONE</button> 
+            <button onClick={()=>test2()} style={{marginRight: '27px'}}>GET NEXT</button> */}
+            <button onClick={()=>props.print()} style={{marginRight: '27px'}}>PRINT</button>             
+            
             <button onClick={()=>tableContentHide()}>ON | OFF CONTENT</button>
             <button onClick={()=>clearSelection()}>CLEAR SELECTION</button>
         </div>
