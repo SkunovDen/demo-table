@@ -11,24 +11,35 @@ function App() {
 //** markers state
   const [selected, setSelected] = useState([])
 
-  const getFirst = (cell) => {
+  
 
-    console.log('GET FIRST')
+  const getFirst = (cell) => {
+    const clickedCol = cell.dataset.col
+    const clickedRow = cell.dataset.row
+
+    const clickedCell = { col : clickedCol, row : clickedRow}
+
+    // console.log('GET FIRST: ', )
     setSelected ( prev => {
-      return [cell]
+      return [clickedCell]
     })
     
     return 1
   }
 
   const getNext = (cell) => {
-    console.log('GET NEXT')
+    // console.log('GET NEXT')
 
     const l = selected.length + 1
 
+    const clickedCol = cell.dataset.col
+    const clickedRow = cell.dataset.row
+
+    const clickedCell = { col : clickedCol, row : clickedRow}
+
     setSelected( (prev) => {    
       let updated = Array.from (prev)
-      updated.push ( cell )
+      updated.push ( clickedCell )
       
       return updated
     })
@@ -38,11 +49,11 @@ function App() {
 
   const print = () => {
     console.log(' ')
-    console.log(selected.join('-'))
+    console.log(selected)
   }
 
   const clear = () => {
-    console.log('CLEAR')
+    // console.log('CLEAR')
     setSelected ( prev => {
       return []
     })
